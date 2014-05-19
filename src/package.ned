@@ -1,0 +1,3 @@
+package simpleveins;
+
+@license(LGPL);
