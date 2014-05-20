@@ -35,7 +35,13 @@ void HorizontalMobility::initialize(int stage)
 
     if (stage == 0){
         moveDir = par("moveTowardsRight").boolValue()?1.0:-1.0;
-        move.setSpeed(par("speed").doubleValue());
+        speed = par("speed").doubleValue();
+        speedOffset = par("speedOffset").doubleValue();
+        ASSERT2(speed>speedOffset,"speed must bigger than speedOffset. Check the INI file.");
+        maxSpeed = speed+speedOffset;
+        minSpeed = speed-speedOffset;
+        move.setSpeed(speed);
+
         acceleration = par("acceleration");
     }
     else if(stage == 1){
@@ -71,7 +77,11 @@ void HorizontalMobility::makeMove()
 
     move.setStart(stepTarget, simTime());
     double nextSpeed = move.getSpeed()+uniform(-1.0,1.0)*acceleration*SIMTIME_DBL(updateInterval);
-    stepTarget.x = (move.getStartPos().x + moveDir*(move.getSpeed() + nextSpeed)*SIMTIME_DBL(updateInterval)/2);
+    if(nextSpeed>maxSpeed)
+        nextSpeed = maxSpeed;
+    if(nextSpeed<minSpeed)
+        nextSpeed = minSpeed;
+    stepTarget.x = (move.getStartPos().x + moveDir*nextSpeed*SIMTIME_DBL(updateInterval));
     stepTarget.y = move.getStartPos().y;
 
     move.setDirectionByTarget(stepTarget);
@@ -79,7 +89,7 @@ void HorizontalMobility::makeMove()
     debugEV << "new stepTarget: " << stepTarget.info() << endl;
 
     // accelerate
-    move.setSpeed(move.getSpeed() + acceleration * SIMTIME_DBL(updateInterval));
+    move.setSpeed(nextSpeed);
 
     fixIfHostGetsOutside();
 }

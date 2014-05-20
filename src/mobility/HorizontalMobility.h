@@ -27,6 +27,7 @@ protected:
     double speed;
     double speedOffset;
     double moveDir;
+    double maxSpeed,minSpeed;
 
     /** @brief always stores the last step for position display update */
     Coord stepTarget;
