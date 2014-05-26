@@ -35,7 +35,7 @@ simple HorizontalMobility extends BaseMobility
     parameters:
         @class(HorizontalMobility);
         bool debug = default(false); // debug switch
-        bool moveTowardsRight = default(false);
+        double angle = default(180);
         double speed @unit(mps) = default(uniform(20mps,35mps)); // speed of the host (in m/s)
         double acceleration @unit(mpss) = default(uniform(2mpss,3.5mpss)); // acceleration of linear motion (m/s2)
         double speedOffset @unit(mps) = default(uniform(5mps,7mps));

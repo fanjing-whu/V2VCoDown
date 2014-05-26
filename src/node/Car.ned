@@ -18,12 +18,12 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 
-package simpleveins.car;
+package simpleveins.node;
 
-import org.mixim.base.modules.*;
 import simpleveins.mobility.HorizontalMobility;
 import simpleveins.application.CooperativeDownload;
-import org.mixim.modules.nic.Nic80211p;
+import simpleveins.globalModuls.GlobalControlUnit;
+
 
 module Car
 {
@@ -31,31 +31,24 @@ module Car
     gates:
         input radioIn; // gate for sendDirect
     submodules:
+        gcu: GlobalControlUnit{
+            parameters:
+                @display("p=130,236");
+        }
+            
         appl: CooperativeDownload {
             parameters:
                 @display("p=60,50");
         }
-
-        arp: BaseArp {
-            parameters:
-                @display("p=130,108");
-        }
-
-        nic: Nic80211p {
-            parameters:
-                @display("p=60,166");
-        }
-
         mobility: HorizontalMobility {
             parameters:
                 @display("p=130,172;i=block/cogwheel");
         }
     connections:
-        nic.upperLayerOut --> appl.lowerLayerIn;
-        nic.upperLayerIn <-- appl.lowerLayerOut;
-        nic.upperControlOut --> appl.lowerControlIn;
-        nic.upperControlIn <-- appl.lowerControlOut;
+        gcu.upperLayerOut --> appl.lowerLayerIn;
+        gcu.upperLayerIn <-- appl.lowerLayerOut;
+        gcu.upperControlOut --> appl.lowerControlIn;
+        gcu.upperControlIn <-- appl.lowerControlOut;
 
-        radioIn --> nic.radioIn;
-
+        radioIn --> gcu.radioIn;
 }

@@ -17,15 +17,39 @@
 #define __SIMPLEVEINS_GLOBALNETWORKLAYER_H_
 
 #include <omnetpp.h>
-
+#include <map>
+#include <list>
+#include "IGlobalControlUnit.h"
+#include "IGlobalNetworkLayer.h"
 /**
  * TODO - Generated class
  */
-class GlobalNetworkLayer : public cSimpleModule
+
+class GlobalNetworkLayer : public cSimpleModule,
+                           public IGlobalNetworkLayer
 {
+
+public:
+    GlobalNetworkLayer();
+    virtual ~GlobalNetworkLayer();
   protected:
-    virtual void initialize();
-    virtual void handleMessage(cMessage *msg);
+    void initialize(int stage);
+    void handleMessage(cMessage *msg);
+
+  public:
+    void registerGCU(IGlobalControlUnit* gcu){
+        gcnMap[gcu->getAddr()] = gcu;
+
+    }
+    void unregisterGCU(IGlobalControlUnit* gcu);
+    void refreshGCU(IGlobalControlUnit* gcu);
+
+  private:
+    typedef std::map<int,IGlobalControlUnit*> GlobalControlUnitMap;
+    typedef std::list<IGlobalControlUnit*> GlobalControlUnitList;
+    GlobalControlUnitMap gcnMap;
+    GlobalControlUnitList gcnList;
+
 };
 
 #endif

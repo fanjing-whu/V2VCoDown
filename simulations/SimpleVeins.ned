@@ -13,12 +13,13 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package simpleveins.base;
+package simpleveins.simulations;
 
 import org.mixim.base.connectionManager.ConnectionManager;
 import org.mixim.base.modules.BaseWorldUtility;;
 import simpleveins.globalModuls.GlobalStatistics;
-import simpleveins.car.Car;
+import simpleveins.globalModuls.GlobalNetworkLayer;
+import simpleveins.node.Car;
 //
 // TODO auto-generated type
 //
@@ -28,27 +29,26 @@ network SimpleVeins
         double playgroundSizeX @unit(m); // x size of the area the nodes are in (in meters)
         double playgroundSizeY @unit(m); // y size of the area the nodes are in (in meters)
         double playgroundSizeZ @unit(m); // z size of the area the nodes are in (in meters)
-
+		int numHosts;
         @display("bgb=$playgroundSizeX,$playgroundSizeY,white;bgp=0,0");
 
     submodules:
         car[numHosts]: Car {
-            @display("p=137,95");
+            @display("p=100,100");
         }
-        connectionManager: ConnectionManager {
+        globalStatistics: GlobalStatistics {
             parameters:
-                @display("p=201,0;i=abstract/multicast;is=s");
+                @display("p=200,100;i=block/blackboard;is=s");
+        }
+        globalNetworkLay: GlobalNetworkLayer{
+            @display("p=100,100;i=block/blackboard;is=s");
         }
         world: BaseWorldUtility {
             parameters:
                 playgroundSizeX = playgroundSizeX;
                 playgroundSizeY = playgroundSizeY;
                 playgroundSizeZ = playgroundSizeZ;
-                @display("p=280,0;i=misc/globe;is=s");
-        }
-        globalStatistics: GlobalStatistics {
-            parameters:
-                @display("p=201,0;i=block/blackboard;is=s");
+                @display("p=300,100;i=misc/globe;is=s");
         }
     connections allowunconnected:
 }

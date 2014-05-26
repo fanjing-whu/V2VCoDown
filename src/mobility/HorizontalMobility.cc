@@ -34,7 +34,7 @@ void HorizontalMobility::initialize(int stage)
     debugEV << "initializing HorizontalMobility stage " << stage << endl;
 
     if (stage == 0){
-        moveDir = par("moveTowardsRight").boolValue()?1.0:-1.0;
+        angle = par("angle").doubleValue();
         speed = par("speed").doubleValue();
         speedOffset = par("speedOffset").doubleValue();
         ASSERT2(speed>speedOffset,"speed must bigger than speedOffset. Check the INI file.");
@@ -81,8 +81,8 @@ void HorizontalMobility::makeMove()
         nextSpeed = maxSpeed;
     if(nextSpeed<minSpeed)
         nextSpeed = minSpeed;
-    stepTarget.x = (move.getStartPos().x + moveDir*nextSpeed*SIMTIME_DBL(updateInterval));
-    stepTarget.y = move.getStartPos().y;
+    stepTarget.x = (move.getStartPos().x + move.getSpeed() * cos(PI * angle / 180) * SIMTIME_DBL(updateInterval));
+    stepTarget.y = (move.getStartPos().y + move.getSpeed() * sin(PI * angle / 180) * SIMTIME_DBL(updateInterval));
 
     move.setDirectionByTarget(stepTarget);
 

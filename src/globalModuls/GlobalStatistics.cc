@@ -75,4 +75,4 @@ void GlobalStatistics::output(string name) {
     }
     fs.close();
 }
-}
+

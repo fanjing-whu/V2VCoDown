@@ -13,17 +13,19 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#include "CooperativeDownload.h"
+#ifndef IGLOBALNETWORKLAYER_H_
+#define IGLOBALNETWORKLAYER_H_
+#include "IGlobalControlUnit.h"
 
-Define_Module(CooperativeDownload);
+class IGlobalNetworkLayer {
+public:
+    IGlobalNetworkLayer() {};
+    virtual ~IGlobalNetworkLayer(){};
 
-void CooperativeDownload::initialize()
-{
-    // TODO - Generated method body
-}
+public:
+    virtual void registerGCU(IGlobalControlUnit* gcu) = 0;
+    virtual void unregisterGCU(IGlobalControlUnit* gcu) = 0;
+    virtual void refreshGCU(IGlobalControlUnit* gcu) = 0;
+};
 
-void CooperativeDownload::handleSelfMsg(cMessage* msg) {
-}
-
-void CooperativeDownload::handleLowerMsg(cMessage* msg) {
-}
+#endif /* IGLOBALNETWORKLAYER_H_ */

@@ -13,17 +13,28 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#include "CooperativeDownload.h"
+cplusplus {{
+#include "ApplPkt_m.h"
+}}
+packet ApplPkt;
 
-Define_Module(CooperativeDownload);
-
-void CooperativeDownload::initialize()
-{
-    // TODO - Generated method body
+//
+// TODO generated message class
+//
+enum CoDownMsgType{
+	CDMT_Base = 0;
+	CDMT_Hello = 1;
+	CDMT_IsBusy = 2;
+	CDMT_IsIdle = 3;
+	CDMT_Send = 4;
+	CDMT_Request = 5;
+	CDMT_Scan = 6;
 }
-
-void CooperativeDownload::handleSelfMsg(cMessage* msg) {
+packet CoDownBaseMsg extends ApplPkt {
+    int msgType @enum(CoDownMsgType);
 }
-
-void CooperativeDownload::handleLowerMsg(cMessage* msg) {
+packet CoDownContentMsg extends CoDownBaseMsg{
+    int startPos;
+    int endPos;
+    bool lastMsg;
 }

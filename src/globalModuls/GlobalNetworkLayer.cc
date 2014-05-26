@@ -17,7 +17,7 @@
 
 Define_Module(GlobalNetworkLayer);
 
-void GlobalNetworkLayer::initialize()
+void GlobalNetworkLayer::initialize(int stage)
 {
     // TODO - Generated method body
 }
@@ -25,4 +25,19 @@ void GlobalNetworkLayer::initialize()
 void GlobalNetworkLayer::handleMessage(cMessage *msg)
 {
     // TODO - Generated method body
+}
+
+void GlobalNetworkLayer::registerGCU(IGlobalControlUnit* gcu) {
+}
+
+GlobalNetworkLayer::GlobalNetworkLayer() {
+}
+
+GlobalNetworkLayer::~GlobalNetworkLayer() {
+}
+
+void GlobalNetworkLayer::unregisterGCU(IGlobalControlUnit* gcu) {
+}
+
+void GlobalNetworkLayer::refreshGCU(IGlobalControlUnit* gcu) {
 }

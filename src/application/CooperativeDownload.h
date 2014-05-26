@@ -17,15 +17,19 @@
 #define __SIMPLEVEINS_COOPERATIVEDOWNLOAD_H_
 
 #include <omnetpp.h>
+#include "BaseApplLayer.h"
 
 /**
  * TODO - Generated class
  */
-class CooperativeDownload : public cSimpleModule
+class CooperativeDownload : public BaseApplLayer
 {
   protected:
     virtual void initialize();
-    virtual void handleMessage(cMessage *msg);
+
+  public:
+    virtual void handleSelfMsg(cMessage *msg);
+    virtual void handleLowerMsg(cMessage *msg);
 };
 
 #endif

@@ -31,5 +31,5 @@ simple CooperativeDownload like IBaseApplLayer
     	input lowerLayerIn; // from network layer
         output lowerLayerOut; // to network layer
         input lowerControlIn; // control from network layer
-        output lowerControlOut; // control to network layer
+        output lowerControlOut; // control to network layer        
 }

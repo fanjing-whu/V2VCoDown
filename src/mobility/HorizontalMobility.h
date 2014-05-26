@@ -26,7 +26,7 @@ protected:
     double acceleration;   ///< acceleration of linear motion
     double speed;
     double speedOffset;
-    double moveDir;
+    double angle;
     double maxSpeed,minSpeed;
 
     /** @brief always stores the last step for position display update */

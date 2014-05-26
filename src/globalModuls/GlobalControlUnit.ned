@@ -13,17 +13,18 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#include "CooperativeDownload.h"
+package simpleveins.globalModuls;
 
-Define_Module(CooperativeDownload);
-
-void CooperativeDownload::initialize()
+//
+// TODO auto-generated module
+//
+simple GlobalControlUnit
 {
-    // TODO - Generated method body
-}
-
-void CooperativeDownload::handleSelfMsg(cMessage* msg) {
-}
-
-void CooperativeDownload::handleLowerMsg(cMessage* msg) {
+    gates:
+        input upperLayerIn; // to upper layers
+        output upperLayerOut; // from upper layers
+        output upperControlOut; // control information 
+        input upperControlIn; // control information 
+        
+        input radioIn; // radioIn gate for sendDirect
 }
