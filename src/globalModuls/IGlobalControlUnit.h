@@ -22,7 +22,7 @@
 class IGlobalControlUnit {
 public:
     IGlobalControlUnit() :
-            neighbors(), hasAp(false), apid(0), lastPos(Coord::ZERO) {
+            neighbors(), hasAp(false), apid(0), lastPos(Coord::ZERO),receivePower(0),sendPower(0){
     }
     virtual ~IGlobalControlUnit() {
     }
@@ -33,15 +33,24 @@ public:
     virtual Coord getCurrentPostion() = 0;
     virtual void setCurrentPostion(Coord pos) = 0;
     virtual void sendMsgToAP(int apid, cMessage *msg) = 0;
-    virtual void connectToGCU(IGlobalControlUnit* gcu) {
+    bool isConnectedTo(IGlobalControlUnit* gcu){
+        return neighbors.find(gcu->getAddr())!=neighbors.end();
+    }
+    bool isInRange(IGlobalControlUnit* gcu){
+        return getDistFrom(gcu)<=receivePower+sendPower;
+    }
+    double getDistFrom(IGlobalControlUnit* gcu){
+        fabs(this->getCurrentPostion().x-gcu->getCurrentPostion().x);
+    }
+    void connectToGCU(IGlobalControlUnit* gcu) {
         neighbors[gcu->getAddr()] = gcu;
     }
-    virtual void disconnectFromGCU(IGlobalControlUnit* gcu) {
+    void disconnectFromGCU(IGlobalControlUnit* gcu) {
         if (neighbors.erase(gcu->getAddr()) > 0) {
             gcu->disconnectFromGCU(this);
         }
     }
-    virtual void disconnectAll() {
+    void disconnectAll() {
         for (IGlobalControlUnitMap::iterator it = neighbors.begin();
                 it != neighbors.end(); it++) {
             this->disconnectFromGCU(it->second);
@@ -57,7 +66,7 @@ public:
             this->apid = 0;
         }
     }
-    virtual IGlobalControlUnitMap* getNeighbors() {
+    IGlobalControlUnitMap* getNeighbors() {
         return &neighbors;
     }
 protected:
@@ -65,6 +74,8 @@ protected:
     bool hasAp;
     int apid;
     Coord lastPos;
+    double sendPower;
+    double receivePower;
 };
 
 #endif /* IGLOBALCONTROLUNIT_H_ */

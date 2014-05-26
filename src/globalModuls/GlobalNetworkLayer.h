@@ -37,18 +37,21 @@ public:
     void handleMessage(cMessage *msg);
 
   public:
-    void registerGCU(IGlobalControlUnit* gcu){
-        gcnMap[gcu->getAddr()] = gcu;
-
-    }
+    void registerGCU(IGlobalControlUnit* gcu);
     void unregisterGCU(IGlobalControlUnit* gcu);
     void refreshGCU(IGlobalControlUnit* gcu);
 
   private:
+    bool compare_GCU(IGlobalControlUnit* lhs,IGlobalControlUnit* rhs){
+        return lhs->getCurrentPostion().x<rhs->getCurrentPostion().x;
+    }
+    void sortGCUList(){
+        gcuSortedList.sort(compare_GCU());
+    }
     typedef std::map<int,IGlobalControlUnit*> GlobalControlUnitMap;
     typedef std::list<IGlobalControlUnit*> GlobalControlUnitList;
-    GlobalControlUnitMap gcnMap;
-    GlobalControlUnitList gcnList;
+    GlobalControlUnitMap gcuMap;
+    GlobalControlUnitList gcuSortedList;
 
 };
 
