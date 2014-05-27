@@ -24,6 +24,9 @@
 /**
  * TODO - Generated class
  */
+#define GNL_IGCU_MAP std::map<int, IGlobalControlUnit*>
+#define GNL_IGCU_LIST std::list<IGlobalControlUnit*>
+
 
 class GlobalNetworkLayer : public cSimpleModule,
                            public IGlobalNetworkLayer
@@ -42,16 +45,11 @@ public:
     void refreshGCU(IGlobalControlUnit* gcu);
 
   private:
-    bool compare_GCU(IGlobalControlUnit* lhs,IGlobalControlUnit* rhs){
-        return lhs->getCurrentPostion().x<rhs->getCurrentPostion().x;
-    }
     void sortGCUList(){
-        gcuSortedList.sort(compare_GCU());
+        gcuSortedList.sort();
     }
-    typedef std::map<int,IGlobalControlUnit*> GlobalControlUnitMap;
-    typedef std::list<IGlobalControlUnit*> GlobalControlUnitList;
-    GlobalControlUnitMap gcuMap;
-    GlobalControlUnitList gcuSortedList;
+    GNL_IGCU_MAP gcuMap;
+    GNL_IGCU_LIST gcuSortedList;
 
 };
 

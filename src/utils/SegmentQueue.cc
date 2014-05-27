@@ -13,24 +13,26 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#include "CooperativeDownload.h"
+#include "SegmentQueue.h"
 
-Define_Module(CooperativeDownload);
 
-CooperativeDownload::CooperativeDownload() {
+SegmentQueue::SegmentQueue() {
 }
 
-CooperativeDownload::~CooperativeDownload() {
+SegmentQueue::~SegmentQueue() {
 }
 
-void CooperativeDownload::initialize()
-{
-    // TODO - Generated method body
+void SegmentQueue::remove(SegmentQueue sq) {
 }
 
-void CooperativeDownload::handleSelfMsg(cMessage* msg) {
+void SegmentQueue::add(SegmentQueue sq) {
+    SQueue::iterator itThis = this->sq.begin();
+    SQueue::iterator itSq = sq.sq.begin();
+    while(itThis!=this->sq.end()||itSq!=sq.sq.end()){
+
+    }
 }
 
+void SegmentQueue::add(double start, double end) {
 
-void CooperativeDownload::handleLowerMsg(cMessage* msg) {
 }

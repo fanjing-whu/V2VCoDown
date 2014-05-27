@@ -18,6 +18,7 @@
 #include <FWMath.h>
 
 Define_Module(HorizontalMobility);
+
 HorizontalMobility::HorizontalMobility() {
     // TODO Auto-generated constructor stub
 
@@ -62,7 +63,7 @@ void HorizontalMobility::initialize(int stage)
 
 void HorizontalMobility::fixIfHostGetsOutside()
 {
-    Coord dummy = Coord(playgroundSizeX(),playgroundSizeX()/2);
+    Coord dummy = Coord(playgroundSizeX()-move.getStartPos().x,playgroundSizeY()/2);
     handleIfOutside(WRAP, stepTarget, dummy, dummy, angle);
 }
 

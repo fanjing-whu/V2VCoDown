@@ -18,6 +18,7 @@
 
 #include "MiXiMDefs.h"
 #include "BaseMobility.h"
+#include "GlobalControlUnit.h"
 class HorizontalMobility: public BaseMobility {
 public:
     HorizontalMobility();
@@ -33,7 +34,6 @@ protected:
     Coord stepTarget;
 
 public:
-    //Module_Class_Members( LinearMobility, BaseMobility, 0 );
 
     /** @brief Initializes mobility model parameters.*/
     virtual void initialize(int);
@@ -43,6 +43,10 @@ protected:
     virtual void makeMove();
 
     virtual void fixIfHostGetsOutside();
+
+protected:
+    // protected members
+    GlobalControlUnit* gcu;
 };
 
 #endif /* HORIZONTALMOBILITY_H_ */

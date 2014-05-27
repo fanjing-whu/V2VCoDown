@@ -19,20 +19,24 @@
 #include "Coord.h"
 #include <map>
 
+#define GCU_IGCU_MAP std::map<int, IGlobalControlUnit*>
 class IGlobalControlUnit {
 public:
     IGlobalControlUnit() :
-            neighbors(), hasAp(false), apid(0), lastPos(Coord::ZERO),receivePower(0),sendPower(0){
+            neighbors(), hasAp(false), apid(0), lastPos(Coord::ZERO),sendPower(0),receivePower(0){
     }
     virtual ~IGlobalControlUnit() {
     }
-protected:
-    typedef std::map<int, IGlobalControlUnit*> IGlobalControlUnitMap;
 public:
     virtual int getAddr() = 0;
-    virtual Coord getCurrentPostion() = 0;
     virtual void setCurrentPostion(Coord pos) = 0;
     virtual void sendMsgToAP(int apid, cMessage *msg) = 0;
+    inline bool operator< (const IGlobalControlUnit& rhs){
+        return this->getCurrentPostion().x<rhs.getCurrentPostion().x;
+    }
+    Coord getCurrentPostion() const{
+        return lastPos;
+    }
     bool isConnectedTo(IGlobalControlUnit* gcu){
         return neighbors.find(gcu->getAddr())!=neighbors.end();
     }
@@ -40,7 +44,7 @@ public:
         return getDistFrom(gcu)<=receivePower+sendPower;
     }
     double getDistFrom(IGlobalControlUnit* gcu){
-        fabs(this->getCurrentPostion().x-gcu->getCurrentPostion().x);
+        return fabs(this->getCurrentPostion().x-gcu->getCurrentPostion().x);
     }
     void connectToGCU(IGlobalControlUnit* gcu) {
         neighbors[gcu->getAddr()] = gcu;
@@ -51,7 +55,7 @@ public:
         }
     }
     void disconnectAll() {
-        for (IGlobalControlUnitMap::iterator it = neighbors.begin();
+        for (GCU_IGCU_MAP::iterator it = neighbors.begin();
                 it != neighbors.end(); it++) {
             this->disconnectFromGCU(it->second);
         }
@@ -66,11 +70,11 @@ public:
             this->apid = 0;
         }
     }
-    IGlobalControlUnitMap* getNeighbors() {
+    GCU_IGCU_MAP* getNeighbors() {
         return &neighbors;
     }
 protected:
-    IGlobalControlUnitMap neighbors;
+    GCU_IGCU_MAP neighbors;
     bool hasAp;
     int apid;
     Coord lastPos;

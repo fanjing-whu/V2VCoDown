@@ -13,24 +13,34 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#include "CooperativeDownload.h"
+#ifndef SEGMENTQUEUE_H_
+#define SEGMENTQUEUE_H_
+#include <list>
 
-Define_Module(CooperativeDownload);
+class SegmentQueue {
+public:
+    SegmentQueue();
+    virtual ~SegmentQueue();
+private:
+    typedef struct {
+        double value;
+        bool flag;
+    } _Container;
+    typedef std::list<_Container*> SQueue;
+    SQueue sq;
+public:
+    void remove(SegmentQueue sq);
+    void add(SegmentQueue sq);
+    void add(double start, double end);
+private:
+    inline bool operator_remove(bool lhs, bool rhs) {
+        return lhs && !rhs;
+    }
+    inline bool operator_add(bool lhs, bool rhs) {
+        return lhs || rhs;
+    }
+};
 
-CooperativeDownload::CooperativeDownload() {
-}
-
-CooperativeDownload::~CooperativeDownload() {
-}
-
-void CooperativeDownload::initialize()
-{
-    // TODO - Generated method body
-}
-
-void CooperativeDownload::handleSelfMsg(cMessage* msg) {
-}
 
 
-void CooperativeDownload::handleLowerMsg(cMessage* msg) {
-}
+#endif /* SEGMENTQUEUE_H_ */

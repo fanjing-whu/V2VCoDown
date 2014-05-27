@@ -29,7 +29,7 @@ void GlobalNetworkLayer::handleMessage(cMessage *msg)
 
 void GlobalNetworkLayer::registerGCU(IGlobalControlUnit* gcu) {
     gcuMap[gcu->getAddr()] = gcu;
-    gcuSortedList.insert(gcu);
+    gcuSortedList.push_back(gcu);
     sortGCUList();
 }
 
@@ -48,8 +48,8 @@ void GlobalNetworkLayer::unregisterGCU(IGlobalControlUnit* gcu) {
 void GlobalNetworkLayer::refreshGCU(IGlobalControlUnit* gcu) {
     //disconnect the out-range GCU
     {
-        GlobalControlUnitMap oldNeighbors = GlobalControlUnitMap(gcu->getNeighbors());
-        for(GlobalControlUnitMap::iterator it = oldNeighbors.begin();it!=oldNeighbors.end();it++){
+        GNL_IGCU_MAP oldNeighbors = GNL_IGCU_MAP(*(gcu->getNeighbors()));
+        for(GNL_IGCU_MAP::iterator it = oldNeighbors.begin();it!=oldNeighbors.end();it++){
             if(!gcu->isInRange(it->second)){
                 gcu->disconnectFromGCU(it->second);
             }
@@ -59,12 +59,12 @@ void GlobalNetworkLayer::refreshGCU(IGlobalControlUnit* gcu) {
     {
         sortGCUList();
         // find this GCU
-        GlobalControlUnitList::iterator thisGCU;
+        GNL_IGCU_LIST::iterator thisGCU;
         for (thisGCU = gcuSortedList.begin(); gcu != *thisGCU; thisGCU++) {
-            ASSERT2(*thisGCU != gcuSortedList.end(), "Error: this GCU is unregistered.");
+            ASSERT2(thisGCU != gcuSortedList.end(), "Error: this GCU is unregistered.");
         }
         //connect to the front GCU
-        GlobalControlUnitList::iterator it = thisGCU;
+        GNL_IGCU_LIST::iterator it = thisGCU;
         for(it++;it!=gcuSortedList.end()&&gcu->isInRange(*it);it++){
             if(!gcu->isConnectedTo(*it)){
                 gcu->connectToGCU(*it);

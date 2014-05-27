@@ -18,18 +18,21 @@
 
 #include <omnetpp.h>
 #include "BaseApplLayer.h"
+#include "FindModule.h"
 
 /**
  * TODO - Generated class
  */
-class CooperativeDownload : public BaseApplLayer
-{
-  protected:
+class CooperativeDownload: public BaseApplLayer {
+public:
+    CooperativeDownload();
+    virtual ~CooperativeDownload();
+protected:
     virtual void initialize();
 
-  public:
-    virtual void handleSelfMsg(cMessage *msg);
-    virtual void handleLowerMsg(cMessage *msg);
+public:
+    void handleSelfMsg(cMessage *msg);
+    void handleLowerMsg(cMessage *msg);
 };
 
 #endif
