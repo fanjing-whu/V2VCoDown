@@ -33,6 +33,9 @@ public:
     void add(SegmentQueue sq);
     void add(double start, double end);
 private:
+    void removeNode(SQueue::iterator it);
+    void addNode(SQueue::iterator it, double value, bool flag);
+
     inline bool operator_remove(bool lhs, bool rhs) {
         return lhs && !rhs;
     }
