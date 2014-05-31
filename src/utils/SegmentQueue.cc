@@ -174,8 +174,7 @@ void SegmentQueue::add(SegmentQueue &sq) {
                     flagSq = (*itSq)->flag;
                     itSq++;
                 }
-            }
-            if((*itThis)->value > (*itSq)->value){
+            }else if((*itThis)->value > (*itSq)->value){
                 if(flagSq){
                     //0:-----|+
                     //1:+|-????
