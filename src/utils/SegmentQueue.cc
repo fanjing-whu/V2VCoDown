@@ -19,15 +19,17 @@
 SegmentQueue::SegmentQueue() {
 }
 
+SegmentQueue::SegmentQueue(double start, double end) {
+	init(start, end);
+}
+
 SegmentQueue::~SegmentQueue() {
-    for(SQueue::iterator it;it!=sq.end();){
-        std::cout<<"v:f "<<(*it)->value<<","<<(*it)->flag<<std::endl;
-        delete(*it);
+    for(SQueue::iterator it = sq.begin();it!=sq.end();){
         removeNode(it);
     }
 }
 
-void SegmentQueue::remove(SegmentQueue sq) {
+void SegmentQueue::remove(SegmentQueue& sq) {
     SQueue::iterator itThis = this->sq.begin();
     SQueue::iterator itSq = sq.sq.begin();
     bool flagThis = false;
@@ -148,7 +150,7 @@ void SegmentQueue::remove(SegmentQueue sq) {
     }
 }
 
-void SegmentQueue::add(SegmentQueue sq) {
+void SegmentQueue::add(SegmentQueue &sq) {
     SQueue::iterator itThis = this->sq.begin();
     SQueue::iterator itSq = sq.sq.begin();
     bool flagThis = false;
@@ -282,6 +284,19 @@ void SegmentQueue::add(SegmentQueue sq) {
     }
 }
 
+void SegmentQueue::output() {
+    std::cout<<":";
+    for(SQueue::iterator it = sq.begin();it!=sq.end();it++){
+        std::cout<<(*it)->value;
+        if((*it)->flag){
+        	std::cout<<"+++";
+        }else{
+        	std::cout<<"---";
+        }
+    }
+    std::cout<<std::endl;
+}
+
 void SegmentQueue::init(double start, double end) {
     SQueue::iterator it = sq.begin();
     if(it!=sq.end()){
@@ -292,15 +307,15 @@ void SegmentQueue::init(double start, double end) {
     addNode(it,end,false);
 }
 
-void SegmentQueue::removeNode(SQueue::iterator it) {
-    delete(*it);
+void SegmentQueue::removeNode(SQueue::iterator &it) {
+    delete((*it));
     // (*it) = NULL;
-    this->sq.erase(it);
+    it = sq.erase(it);
 }
 
-void SegmentQueue::addNode(SQueue::iterator it, double value, bool flag) {
+void SegmentQueue::addNode(SQueue::iterator &it, double value, bool flag) {
     _Container* e = new _Container();
     e->value = value;
     e->flag = flag;
-    this->sq.insert(itThis,e);
+    sq.insert(it,e);
 }

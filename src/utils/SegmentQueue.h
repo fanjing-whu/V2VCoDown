@@ -20,6 +20,7 @@
 class SegmentQueue {
 public:
     SegmentQueue();
+    SegmentQueue(double start,double end);
     virtual ~SegmentQueue();
 private:
     typedef struct {
@@ -29,11 +30,12 @@ private:
     typedef std::list<_Container*> SQueue;
     SQueue sq;
 public:
-    void remove(SegmentQueue sq);
-    void add(SegmentQueue sq);
+    void remove(SegmentQueue& sq);
+    void add(SegmentQueue& sq);
+    void output();
 private:
-    void removeNode(SQueue::iterator it);
-    void addNode(SQueue::iterator it, double value, bool flag);
+    void removeNode(SQueue::iterator &it);
+    void addNode(SQueue::iterator &it, double value, bool flag);
 
     void init(double start, double end);
 
