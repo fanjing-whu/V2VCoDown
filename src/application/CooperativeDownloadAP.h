@@ -13,22 +13,25 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#ifndef IGLOBALNETWORKLAYER_H_
-#define IGLOBALNETWORKLAYER_H_
-#include "IGlobalControlUnit.h"
-#include "cmessage.h"
+#ifndef __SIMPLEVEINS_COOPERATIVEDOWNLOADAP_H_
+#define __SIMPLEVEINS_COOPERATIVEDOWNLOADAP_H_
 
-class IGlobalNetworkLayer {
-public:
-    IGlobalNetworkLayer() {};
-    virtual ~IGlobalNetworkLayer(){};
+#include <omnetpp.h>
+#include "BaseApplLayer.h"
+#include "FindModule.h"
+/**
+ * TODO - Generated class
+ */
+class CooperativeDownloadAP : public BaseApplLayer
+{public:
+    CooperativeDownloadAP();
+    virtual ~CooperativeDownloadAP();
+protected:
+    virtual void initialize();
 
 public:
-    virtual void registerGCU(IGlobalControlUnit* gcu) = 0;
-    virtual void unregisterGCU(IGlobalControlUnit* gcu) = 0;
-    virtual void refreshGCU(IGlobalControlUnit* gcu) = 0;
-    virtual void sendMsg(cMessage* msg) = 0;
-    virtual void sendMsgToAP(int apid,cMessage* msg) = 0;
+    void handleSelfMsg(cMessage *msg);
+    void handleLowerMsg(cMessage *msg);
 };
 
-#endif /* IGLOBALNETWORKLAYER_H_ */
+#endif

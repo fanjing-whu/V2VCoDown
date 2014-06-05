@@ -28,20 +28,24 @@ public:
     virtual ~IGlobalControlUnit() {
     }
 public:
-    virtual int getAddr() = 0;
-    virtual void setCurrentPostion(Coord pos) = 0;
-    virtual void sendMsgToAP(int apid, cMessage *msg) = 0;
     inline bool operator< (const IGlobalControlUnit& rhs){
         return this->getCurrentPostion().x<rhs.getCurrentPostion().x;
     }
-    Coord getCurrentPostion() const{
-        return lastPos;
+
+public:
+    virtual int getAddr() = 0;
+    virtual void setCurrentPostion(Coord pos) = 0;
+    virtual Coord getCurrentPostion() = 0;
+    virtual void handleMsgFromNetwLayer(cMessage* msg) = 0;
+public:
+    bool isAp(){
+        return isAp;
     }
     bool isConnectedTo(IGlobalControlUnit* gcu){
         return neighbors.find(gcu->getAddr())!=neighbors.end();
     }
     bool isInRange(IGlobalControlUnit* gcu){
-        return getDistFrom(gcu)<=receivePower+sendPower;
+        return (getDistFrom(gcu)<=gcu->receivePower+sendPower)&&(getDistFrom(gcu)<=receivePower+gcu->sendPower);
     }
     double getDistFrom(IGlobalControlUnit* gcu){
         return fabs(this->getCurrentPostion().x-gcu->getCurrentPostion().x);
@@ -60,21 +64,28 @@ public:
             this->disconnectFromGCU(it->second);
         }
     }
-    virtual void connectToAP(int apid) {
+    void connectToAP(int apid) {
         hasAp = true;
         this->apid = apid;
     }
-    virtual void disconnectFromAP(int apid) {
+    void disconnectFromAP(int apid) {
         if (this->apid == apid) {
             hasAp = false;
             this->apid = 0;
         }
+    }
+    bool hasAp(){
+        return hasAp;
+    }
+    int apid(){
+        return hasAp?apid:-1;
     }
     GCU_IGCU_MAP* getNeighbors() {
         return &neighbors;
     }
 protected:
     GCU_IGCU_MAP neighbors;
+    bool isAp;
     bool hasAp;
     int apid;
     Coord lastPos;

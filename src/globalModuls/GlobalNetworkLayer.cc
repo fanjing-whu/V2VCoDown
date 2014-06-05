@@ -28,9 +28,13 @@ void GlobalNetworkLayer::handleMessage(cMessage *msg)
 }
 
 void GlobalNetworkLayer::registerGCU(IGlobalControlUnit* gcu) {
-    gcuMap[gcu->getAddr()] = gcu;
-    gcuSortedList.push_back(gcu);
-    sortGCUList();
+    if(gcu->isAp()){
+        apMap[gcu->getAddr()] = gcu;
+    }else{
+        gcuMap[gcu->getAddr()] = gcu;
+        gcuSortedList.push_back(gcu);
+        sortGCUList();
+    }
 }
 
 GlobalNetworkLayer::GlobalNetworkLayer() {
@@ -40,9 +44,14 @@ GlobalNetworkLayer::~GlobalNetworkLayer() {
 }
 
 void GlobalNetworkLayer::unregisterGCU(IGlobalControlUnit* gcu) {
-    gcu->disconnectAll();
-    gcuMap.erase(gcu->getAddr());
-    gcuSortedList.remove(gcu);
+    if(gcu->isAp()){
+        gcu->disconnectAll();
+        apMap.erase(gcu->getAddr());
+    }else{
+        gcu->disconnectAll();
+        gcuMap.erase(gcu->getAddr());
+        gcuSortedList.remove(gcu);
+    }
 }
 
 void GlobalNetworkLayer::refreshGCU(IGlobalControlUnit* gcu) {
@@ -78,4 +87,30 @@ void GlobalNetworkLayer::refreshGCU(IGlobalControlUnit* gcu) {
             }
         }
     }
+    // refresh the connect with AP
+    {
+
+    }
+}
+
+void GlobalNetworkLayer::sendMsg(cMessage* msg) {
+    ApplPkt* pkt = check_and_cast<ApplPkt*>(msg);
+    gcuMap[pkt->getDestAddr()]->handleMsgFromNetwLayer(msg);
+}
+
+void GlobalNetworkLayer::sendMsgToAP(int apid, cMessage* msg) {
+    // TODO 2014-6-5
+    apMap[apid]->handleMsgFromNetwLayer(msg);
+}
+
+void GlobalNetworkLayer::sortGCUList() {
+    gcuSortedList.sort();
+}
+
+int GlobalNetworkLayer::convertIPtoIndex(LAddress::L3Type ip) {
+    return ip;
+}
+
+LAddress::L3Type GlobalNetworkLayer::convertIndextoIP(int index) {
+    return index;
 }

@@ -36,8 +36,9 @@ protected:
 
 public:
     int getAddr();
-    Coord getCurrentPostion();
+    Coord getCurrentPostion() const;
     void setCurrentPostion(Coord pos);
+    void handleMsgFromNetwLayer(cMessage* msg);
     void sendMsgToAP(int apid, cMessage *msg);
 
     /** @brief Handle self messages such as timer... */

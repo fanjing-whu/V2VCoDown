@@ -30,16 +30,21 @@ network SimpleVeins
         double playgroundSizeY @unit(m); // y size of the area the nodes are in (in meters)
         double playgroundSizeZ @unit(m); // z size of the area the nodes are in (in meters)
 		int numHosts;
+		int numAPs;
         @display("bgb=$playgroundSizeX,$playgroundSizeY,white;bgp=0,0");
 
     submodules:
         car[numHosts]: Car {
             @display("p=100,100");
         }
+        ap[numAPs]:AP{
+            @display("p=100,100");
+        }
         globalStatistics: GlobalStatistics {
             parameters:
                 @display("p=200,100;i=block/blackboard;is=s");
         }
+        
         globalNetworkLay: GlobalNetworkLayer{
             @display("p=100,100;i=block/blackboard;is=s");
         }

@@ -21,6 +21,8 @@
 #include <list>
 #include "IGlobalControlUnit.h"
 #include "IGlobalNetworkLayer.h"
+#include "SimpleAddress.h"
+#include "ApplPkt_m.h"
 /**
  * TODO - Generated class
  */
@@ -43,14 +45,16 @@ public:
     void registerGCU(IGlobalControlUnit* gcu);
     void unregisterGCU(IGlobalControlUnit* gcu);
     void refreshGCU(IGlobalControlUnit* gcu);
+    void sendMsg(cMessage* msg);
+    void sendMsgToAP(int apid, cMessage* msg);
 
   private:
-    void sortGCUList(){
-        gcuSortedList.sort();
-    }
+    void sortGCUList();
+    int convertIPtoIndex(LAddress::L3Type ip);
+    LAddress::L3Type convertIndextoIP(int index);
     GNL_IGCU_MAP gcuMap;
+    GNL_IGCU_MAP apMap;
     GNL_IGCU_LIST gcuSortedList;
-
 };
 
 #endif

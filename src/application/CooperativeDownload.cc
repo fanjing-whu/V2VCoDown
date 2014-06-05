@@ -31,6 +31,5 @@ void CooperativeDownload::initialize()
 void CooperativeDownload::handleSelfMsg(cMessage* msg) {
 }
 
-
 void CooperativeDownload::handleLowerMsg(cMessage* msg) {
 }
