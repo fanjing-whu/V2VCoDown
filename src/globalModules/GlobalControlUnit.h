@@ -17,7 +17,7 @@
 #define __SIMPLEVEINS_GLOBALCONTROLUNIT_H_
 
 #include <omnetpp.h>
-#include "IGlobalNetworkLayer.h"
+#include "GlobalNetworkLayer.h"
 #include "IGlobalControlUnit.h"
 #include "FindModule.h"
 #include "Coord.h"
@@ -30,21 +30,22 @@ public:
     GlobalControlUnit();
     virtual ~GlobalControlUnit();
 protected:
-    void initialize(int stage);
-    void handleMessage(cMessage *msg);
-    void finish();
+    virtual void initialize(int stage);
+    virtual void handleMessage(cMessage *msg);
+    virtual void finish();
 
 public:
-    int getAddr();
-    Coord getCurrentPostion() const;
-    void setCurrentPostion(Coord pos);
-    void handleMsgFromNetwLayer(cMessage* msg);
-    void sendMsgToAP(int apid, cMessage *msg);
+    virtual int getAddr();
+    virtual void setAddr(int addr);
+    virtual Coord getCurrentPostion();
+    virtual void setCurrentPostion(Coord pos);
+    virtual void handleMsgFromNetwLayer(cMessage* msg);
+    virtual void sendMsgToAP(int apid, cMessage *msg);
 
     /** @brief Handle self messages such as timer... */
-    void handleSelfMsg(cMessage* msg);
-    void handleUpperMsg(cMessage *msg);
-    void handleUpperControl(cMessage *msg);
+    virtual void handleSelfMsg(cMessage* msg);
+    virtual void handleUpperMsg(cMessage *msg);
+    virtual void handleUpperControl(cMessage *msg);
 
     /** @brief Sends a message to the upper layer
      *
@@ -53,10 +54,10 @@ public:
      * superflous frames. We recommend that you use a pair of
      * functions decapsMsg/encapsMsg.
      */
-    void sendUp(cMessage *msg);
+    virtual void sendUp(cMessage *msg);
 
     /** @brief Sends a control message to an upper layer */
-    void sendControlUp(cMessage *msg);
+    virtual void sendControlUp(cMessage *msg);
 protected:
 
     /* gate ids */
@@ -65,7 +66,8 @@ protected:
     int upperControlIn;
     int upperControlOut;
 private:
-    IGlobalNetworkLayer *gnl;
+    GlobalNetworkLayer *gnl;
+    int myAddress;
 
 };
 

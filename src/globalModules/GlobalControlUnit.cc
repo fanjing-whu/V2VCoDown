@@ -17,14 +17,22 @@
 
 Define_Module(GlobalControlUnit);
 
+GlobalControlUnit::GlobalControlUnit()
+    :gnl(NULL),myAddress(0)
+{
+}
+
+GlobalControlUnit::~GlobalControlUnit() {
+}
+
 void GlobalControlUnit::initialize(int stage)
 {
     // TODO - Generated method body
 
-    cSimpleModule::initialize(stage);
+    EV<<"GlobalControlUnit::initialize(stage = "<< stage <<")"<<endl;
     if(stage==0){
-        gnl=FindModule<IGlobalNetworkLayer*>::findGlobalModule();
-        ASSERT2(gnl!=NULL,"Can not find the GlobalNetworkLayer modul.");
+        gnl=FindModule<GlobalNetworkLayer*>::findGlobalModule();
+        ASSERT2(gnl!=NULL,"Can not find the GlobalNetworkLayer module.");
 
         upperLayerIn  = findGate("upperLayerIn");
         upperLayerOut = findGate("upperLayerOut");
@@ -59,7 +67,6 @@ void GlobalControlUnit::handleMessage(cMessage *msg)
          */
         opp_error("Unknown gateID?? Check configuration or override handleMessage().");
     }
-
 }
 
 void GlobalControlUnit::sendUp(cMessage *msg) {
@@ -69,33 +76,43 @@ void GlobalControlUnit::sendUp(cMessage *msg) {
 void GlobalControlUnit::finish() {
 }
 
-Coord GlobalControlUnit::getCurrentPostion() {
-    return Coord::ZERO;
+Coord GlobalControlUnit::getCurrentPostion(){
+    return lastPos;
 }
 
 void GlobalControlUnit::setCurrentPostion(Coord pos) {
+    lastPos = pos;
+    gnl->refreshGCU(this);
 }
 
 void GlobalControlUnit::sendMsgToAP(int apid, cMessage* msg) {
+    gnl->sendMsgToAP(apid, msg);
 }
 
 void GlobalControlUnit::handleSelfMsg(cMessage* msg) {
+    std::cout<<"The GlobalControlUnit does not handle any self message."<<std::endl;
+    delete(msg);
 }
 
 void GlobalControlUnit::handleUpperMsg(cMessage* msg) {
+    gnl->sendMsg(msg);
 }
 
 void GlobalControlUnit::handleUpperControl(cMessage* msg) {
+    std::cout<<"The GlobalControlUnit does not handle any control message."<<std::endl;
+    delete(msg);
 }
 
 int GlobalControlUnit::getAddr() {
-    return 0;
+    return myAddress;
 }
 
-GlobalControlUnit::GlobalControlUnit() {
+void GlobalControlUnit::handleMsgFromNetwLayer(cMessage* msg) {
+    sendUp(msg);
 }
 
-GlobalControlUnit::~GlobalControlUnit() {
+void GlobalControlUnit::setAddr(int addr) {
+    this->myAddress = addr;
 }
 
 void GlobalControlUnit::sendControlUp(cMessage *msg) {

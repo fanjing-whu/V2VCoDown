@@ -17,9 +17,10 @@ package simpleveins.simulations;
 
 import org.mixim.base.connectionManager.ConnectionManager;
 import org.mixim.base.modules.BaseWorldUtility;;
-import simpleveins.globalModuls.GlobalStatistics;
-import simpleveins.globalModuls.GlobalNetworkLayer;
+import simpleveins.globalModules.GlobalStatistics;
+import simpleveins.globalModules.GlobalNetworkLayer;
 import simpleveins.node.Car;
+import simpleveins.node.AP;
 //
 // TODO auto-generated type
 //

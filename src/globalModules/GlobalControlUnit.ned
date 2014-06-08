@@ -13,12 +13,18 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package simpleveins.globalModuls;
+package simpleveins.globalModules;
 
 //
 // TODO auto-generated module
 //
-simple GlobalNetworkLayer
+simple GlobalControlUnit
 {
-    
+    gates:
+        input upperLayerIn; // to upper layers
+        output upperLayerOut; // from upper layers
+        output upperControlOut; // control information 
+        input upperControlIn; // control information 
+        
+        input radioIn; // radioIn gate for sendDirect
 }

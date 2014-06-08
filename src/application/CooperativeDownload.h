@@ -19,6 +19,7 @@
 #include <omnetpp.h>
 #include "BaseApplLayer.h"
 #include "FindModule.h"
+#include "CooperativeDownloadMsg_m.h"
 
 /**
  * TODO - Generated class
@@ -33,6 +34,8 @@ protected:
 public:
     void handleSelfMsg(cMessage *msg);
     void handleLowerMsg(cMessage *msg);
+
+private:
 };
 
 #endif

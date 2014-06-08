@@ -17,12 +17,19 @@
 
 Define_Module(CooperativeDownloadAP);
 
+CooperativeDownloadAP::CooperativeDownloadAP() {
+}
+
+CooperativeDownloadAP::~CooperativeDownloadAP() {
+}
+
 void CooperativeDownloadAP::initialize()
 {
     // TODO - Generated method body
 }
 
-void CooperativeDownloadAP::handleMessage(cMessage *msg)
-{
-    // TODO - Generated method body
+void CooperativeDownloadAP::handleSelfMsg(cMessage* msg) {
+}
+
+void CooperativeDownloadAP::handleLowerMsg(cMessage* msg) {
 }

@@ -22,13 +22,15 @@ packet ApplPkt;
 // TODO generated message class
 //
 enum CoDownMsgType{
-	CDMT_Base = 0;
-	CDMT_Hello = 1;
-	CDMT_IsBusy = 2;
-	CDMT_IsIdle = 3;
-	CDMT_Send = 4;
-	CDMT_Request = 5;
-	CDMT_Scan = 6;
+	CDMT_Base = 0;	// do not use this msg type
+	CDMT_Hello = 1;	// 
+	CDMT_IsBusy = 2;	// reply for hello msg
+	CDMT_IsIdle = 3;	//
+	CDMT_Send = 4;	// 
+	CDMT_Request = 5;	// from target to coorperative car
+	CDMT_Scan = 6;	// use for making back-up
+	CDMT_Negative = 7;	// 
+	CDMT_Acative = 8;	// 
 }
 packet CoDownBaseMsg extends ApplPkt {
     int msgType @enum(CoDownMsgType);

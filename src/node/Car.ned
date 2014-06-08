@@ -22,7 +22,7 @@ package simpleveins.node;
 
 import simpleveins.mobility.HorizontalMobility;
 import simpleveins.application.CooperativeDownload;
-import simpleveins.globalModuls.GlobalControlUnit;
+import simpleveins.globalModules.GlobalControlUnit;
 
 
 module Car
@@ -33,16 +33,15 @@ module Car
     submodules:
         gcu: GlobalControlUnit{
             parameters:
-                @display("p=130,236");
+                @display("p=60,120");
         }
-            
         appl: CooperativeDownload {
             parameters:
                 @display("p=60,50");
         }
         mobility: HorizontalMobility {
             parameters:
-                @display("p=130,172;i=block/cogwheel");
+                @display("p=130,50;i=block/cogwheel");
         }
     connections:
         gcu.upperLayerOut --> appl.lowerLayerIn;

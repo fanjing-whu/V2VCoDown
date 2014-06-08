@@ -23,12 +23,12 @@
 class IGlobalControlUnit {
 public:
     IGlobalControlUnit() :
-            neighbors(), hasAp(false), apid(0), lastPos(Coord::ZERO),sendPower(0),receivePower(0){
+            neighbors(),m_isAp(false), m_hasAp(false), m_apid(0), lastPos(Coord::ZERO),sendPower(0),receivePower(0){
     }
     virtual ~IGlobalControlUnit() {
     }
 public:
-    inline bool operator< (const IGlobalControlUnit& rhs){
+    inline bool operator< (IGlobalControlUnit& rhs){
         return this->getCurrentPostion().x<rhs.getCurrentPostion().x;
     }
 
@@ -39,7 +39,10 @@ public:
     virtual void handleMsgFromNetwLayer(cMessage* msg) = 0;
 public:
     bool isAp(){
-        return isAp;
+        return m_isAp;
+    }
+    void isAp(bool isAp){
+        this->m_isAp = isAp;
     }
     bool isConnectedTo(IGlobalControlUnit* gcu){
         return neighbors.find(gcu->getAddr())!=neighbors.end();
@@ -65,29 +68,31 @@ public:
         }
     }
     void connectToAP(int apid) {
-        hasAp = true;
-        this->apid = apid;
+        m_hasAp = true;
+        this->m_apid = apid;
     }
     void disconnectFromAP(int apid) {
-        if (this->apid == apid) {
-            hasAp = false;
-            this->apid = 0;
-        }
+        ASSERT2(this->m_apid == apid, "Error: Cannot disconnect form this AP, since this GCU dose not connect to it.");
+        m_hasAp = false;
+        this->m_apid = 0;
     }
     bool hasAp(){
-        return hasAp;
+        return m_hasAp;
     }
     int apid(){
-        return hasAp?apid:-1;
+        return m_hasAp?m_apid:-1;
+    }
+    void apid(int apid){
+        this->m_apid = apid;
     }
     GCU_IGCU_MAP* getNeighbors() {
         return &neighbors;
     }
 protected:
     GCU_IGCU_MAP neighbors;
-    bool isAp;
-    bool hasAp;
-    int apid;
+    bool m_isAp;
+    bool m_hasAp;
+    int m_apid;
     Coord lastPos;
     double sendPower;
     double receivePower;

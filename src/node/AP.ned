@@ -21,8 +21,8 @@
 package simpleveins.node;
 
 import org.mixim.modules.mobility.ConstSpeedMobility;
-import simpleveins.application.CooperativeDownload;
-import simpleveins.globalModuls.GlobalControlUnit;
+import simpleveins.application.CooperativeDownloadAP;
+import simpleveins.globalModules.GlobalControlUnit;
 
 
 module AP
@@ -33,15 +33,15 @@ module AP
     submodules:
         gcu: GlobalControlUnit{
             parameters:
-                @display("p=130,236");
+                @display("p=60,120");
         }
-        appl: CooperativeDownload {
+        appl: CooperativeDownloadAP {
             parameters:
                 @display("p=60,50");
         }
         mobility: ConstSpeedMobility {
             parameters:
-                @display("p=130,172;i=block/cogwheel");
+                @display("p=130,50;i=block/cogwheel");
         }
     connections:
         gcu.upperLayerOut --> appl.lowerLayerIn;

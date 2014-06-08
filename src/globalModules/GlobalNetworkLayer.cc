@@ -19,12 +19,13 @@ Define_Module(GlobalNetworkLayer);
 
 void GlobalNetworkLayer::initialize(int stage)
 {
-    // TODO - Generated method body
+    EV<<"GlobalNetworkLayer::initialize(stage = "<< stage <<")"<<endl;
 }
 
 void GlobalNetworkLayer::handleMessage(cMessage *msg)
 {
-    // TODO - Generated method body
+    std::cout<<"The GlobalNetworkLayer does not handle any message."<<std::endl;
+    delete(msg);
 }
 
 void GlobalNetworkLayer::registerGCU(IGlobalControlUnit* gcu) {
@@ -89,7 +90,16 @@ void GlobalNetworkLayer::refreshGCU(IGlobalControlUnit* gcu) {
     }
     // refresh the connect with AP
     {
-
+        GNL_IGCU_MAP::iterator it;
+        for (it = apMap.begin();; it++) {
+            if( it==apMap.end()) {
+                gcu->disconnectFromAP(gcu->apid());
+                break;
+            }else if(gcu->isInRange(it->second)){
+                ASSERT2(!gcu->hasAp()||gcu->apid()==it->second->apid(), "Error: this GCU already has an other AP connected.");
+                gcu->connectToAP(it->second->apid());
+            }
+        }
     }
 }
 

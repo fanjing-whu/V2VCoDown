@@ -13,11 +13,12 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package simpleveins.globalModuls;
+package simpleveins.globalModules;
 
 //
 // TODO auto-generated module
 //
-simple GlobalStatistics
+simple GlobalNetworkLayer
 {
+    
 }

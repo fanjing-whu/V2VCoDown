@@ -17,13 +17,19 @@
 #define __SIMPLEVEINS_COOPERATIVEDOWNLOADAP_H_
 
 #include <omnetpp.h>
+#include <map>
 #include "BaseApplLayer.h"
 #include "FindModule.h"
+#include "SegmentQueue.h"
+
+
 /**
  * TODO - Generated class
  */
+#define CDAP_SQUEUE_MAP std::map<int,SegmentQueue*>
 class CooperativeDownloadAP : public BaseApplLayer
-{public:
+{
+public:
     CooperativeDownloadAP();
     virtual ~CooperativeDownloadAP();
 protected:
@@ -32,6 +38,10 @@ protected:
 public:
     void handleSelfMsg(cMessage *msg);
     void handleLowerMsg(cMessage *msg);
+    void handleLowerControl(cMessage* msg);
+private:
+    CDAP_SQUEUE_MAP SQueueMap;
+
 };
 
 #endif
