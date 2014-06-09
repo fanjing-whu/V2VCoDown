@@ -33,3 +33,6 @@ void CooperativeDownloadAP::handleSelfMsg(cMessage* msg) {
 
 void CooperativeDownloadAP::handleLowerMsg(cMessage* msg) {
 }
+
+void CooperativeDownloadAP::handleLowerControl(cMessage* msg) {
+}
