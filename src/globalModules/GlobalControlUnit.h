@@ -40,23 +40,19 @@ public:
     virtual Coord getCurrentPostion();
     virtual void setCurrentPostion(Coord pos);
     virtual void handleMsgFromNetwLayer(cMessage* msg);
+    virtual void connectToGCU(IGlobalControlUnit* gcu);
+    virtual void disconnectFromGCU(IGlobalControlUnit* gcu);
+    virtual void disconnectAll();
+    virtual void connectToAP(int apid);
+    virtual void disconnectFromAP(int apid);
     virtual void sendMsgToAP(int apid, cMessage *msg);
 
-    /** @brief Handle self messages such as timer... */
     virtual void handleSelfMsg(cMessage* msg);
     virtual void handleUpperMsg(cMessage *msg);
     virtual void handleUpperControl(cMessage *msg);
 
-    /** @brief Sends a message to the upper layer
-     *
-     * Short hand for send(msg, upperLayerOut);
-     * You have to take care of decapsulation and deletion of
-     * superflous frames. We recommend that you use a pair of
-     * functions decapsMsg/encapsMsg.
-     */
     virtual void sendUp(cMessage *msg);
 
-    /** @brief Sends a control message to an upper layer */
     virtual void sendControlUp(cMessage *msg);
 protected:
 

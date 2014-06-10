@@ -115,6 +115,23 @@ void GlobalControlUnit::setAddr(int addr) {
     this->myAddress = addr;
 }
 
+void GlobalControlUnit::connectToGCU(IGlobalControlUnit* gcu) {
+    IGlobalControlUnit::connectToGCU(gcu);
+
+}
+
+void GlobalControlUnit::disconnectFromGCU(IGlobalControlUnit* gcu) {
+}
+
+void GlobalControlUnit::disconnectAll() {
+}
+
+void GlobalControlUnit::connectToAP(int apid) {
+}
+
+void GlobalControlUnit::disconnectFromAP(int apid) {
+}
+
 void GlobalControlUnit::sendControlUp(cMessage *msg) {
     if (gate(upperControlOut)->isPathOK())
         send(msg, upperControlOut);

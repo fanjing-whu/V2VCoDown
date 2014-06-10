@@ -37,6 +37,28 @@ public:
     virtual void setCurrentPostion(Coord pos) = 0;
     virtual Coord getCurrentPostion() = 0;
     virtual void handleMsgFromNetwLayer(cMessage* msg) = 0;
+    virtual void connectToGCU(IGlobalControlUnit* gcu) {
+        neighbors[gcu->getAddr()] = gcu;
+    }
+    virtual void disconnectFromGCU(IGlobalControlUnit* gcu) {
+        if (neighbors.erase(gcu->getAddr()) > 0) {
+            gcu->disconnectFromGCU(this);
+        }
+    }
+    virtual void disconnectAll() {
+        for (GCU_IGCU_MAP::iterator it = neighbors.begin();it != neighbors.end(); it++) {
+            this->disconnectFromGCU(it->second);
+        }
+    }
+    virtual void connectToAP(int apid) {
+        m_hasAp = true;
+        this->m_apid = apid;
+    }
+    virtual void disconnectFromAP(int apid) {
+        ASSERT2(this->m_apid == apid, "Error: Cannot disconnect form this AP, since this GCU dose not connect to it.");
+        m_hasAp = false;
+        this->m_apid = 0;
+    }
 public:
     bool isAp(){
         return m_isAp;
@@ -53,29 +75,6 @@ public:
     double getDistFrom(IGlobalControlUnit* gcu){
         return fabs(this->getCurrentPostion().x-gcu->getCurrentPostion().x);
     }
-    void connectToGCU(IGlobalControlUnit* gcu) {
-        neighbors[gcu->getAddr()] = gcu;
-    }
-    void disconnectFromGCU(IGlobalControlUnit* gcu) {
-        if (neighbors.erase(gcu->getAddr()) > 0) {
-            gcu->disconnectFromGCU(this);
-        }
-    }
-    void disconnectAll() {
-        for (GCU_IGCU_MAP::iterator it = neighbors.begin();
-                it != neighbors.end(); it++) {
-            this->disconnectFromGCU(it->second);
-        }
-    }
-    void connectToAP(int apid) {
-        m_hasAp = true;
-        this->m_apid = apid;
-    }
-    void disconnectFromAP(int apid) {
-        ASSERT2(this->m_apid == apid, "Error: Cannot disconnect form this AP, since this GCU dose not connect to it.");
-        m_hasAp = false;
-        this->m_apid = 0;
-    }
     bool hasAp(){
         return m_hasAp;
     }
@@ -88,6 +87,27 @@ public:
     GCU_IGCU_MAP* getNeighbors() {
         return &neighbors;
     }
+
+    double getReceivePower() const
+    {
+        return receivePower;
+    }
+
+    void setReceivePower(double receivePower)
+    {
+        this->receivePower = receivePower;
+    }
+
+    double getSendPower() const
+    {
+        return sendPower;
+    }
+
+    void setSendPower(double sendPower)
+    {
+        this->sendPower = sendPower;
+    }
+
 protected:
     GCU_IGCU_MAP neighbors;
     bool m_isAp;

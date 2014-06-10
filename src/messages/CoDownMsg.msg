@@ -31,12 +31,27 @@ enum CoDownMsgType{
 	CDMT_Scan = 6;	// use for making back-up
 	CDMT_Negative = 7;	// 
 	CDMT_Acative = 8;	// 
+	CDMT_Quit = 9;
 }
 packet CoDownBaseMsg extends ApplPkt {
     int msgType @enum(CoDownMsgType);
+}
+packet CoDownSensorMsg extends CoDownBaseMsg{
+    double speed;
+    double angle;
 }
 packet CoDownContentMsg extends CoDownBaseMsg{
     int startPos;
     int endPos;
     bool lastMsg;
+}
+enum CoDownCtrlMsgType{
+	CDCMT_ConnectToGCU = 0;
+	CDCMT_ConnectToAP = 1;
+	CDCMT_DisconnectFromGCU = 2;
+	CDCMT_DisconnectFromAP = 3;
+}
+packet CoDownCtrlMsg{
+    int msgType @enum(CoDownCtrlMsgType);
+    int id;
 }

@@ -40,8 +40,8 @@ public:
     void handleLowerMsg(cMessage *msg);
     void handleLowerControl(cMessage* msg);
 private:
-    CDAP_SQUEUE_MAP SQueueMap;
-
+    CDAP_SQUEUE_MAP timeQueueMap;
+    CDAP_SQUEUE_MAP contentQueueMap;
 };
 
 #endif
