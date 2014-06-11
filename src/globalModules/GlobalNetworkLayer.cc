@@ -29,6 +29,7 @@ void GlobalNetworkLayer::handleMessage(cMessage *msg)
 }
 
 void GlobalNetworkLayer::registerGCU(IGlobalControlUnit* gcu) {
+    Enter_Method_Silent();
     if(gcu->isAp()){
         apMap[gcu->getAddr()] = gcu;
     }else{
@@ -45,6 +46,7 @@ GlobalNetworkLayer::~GlobalNetworkLayer() {
 }
 
 void GlobalNetworkLayer::unregisterGCU(IGlobalControlUnit* gcu) {
+    Enter_Method_Silent();
     if(gcu->isAp()){
         gcu->disconnectAll();
         apMap.erase(gcu->getAddr());
@@ -56,6 +58,7 @@ void GlobalNetworkLayer::unregisterGCU(IGlobalControlUnit* gcu) {
 }
 
 void GlobalNetworkLayer::refreshGCU(IGlobalControlUnit* gcu) {
+    Enter_Method_Silent();
     //disconnect the out-range GCU
     {
         GNL_IGCU_MAP oldNeighbors = GNL_IGCU_MAP(*(gcu->getNeighbors()));
@@ -104,12 +107,13 @@ void GlobalNetworkLayer::refreshGCU(IGlobalControlUnit* gcu) {
 }
 
 void GlobalNetworkLayer::sendMsg(cMessage* msg) {
+    Enter_Method_Silent();
     ApplPkt* pkt = check_and_cast<ApplPkt*>(msg);
     gcuMap[pkt->getDestAddr()]->handleMsgFromNetwLayer(msg);
 }
 
 void GlobalNetworkLayer::sendMsgToAP(int apid, cMessage* msg) {
-    // TODO 2014-6-5
+    Enter_Method_Silent();
     apMap[apid]->handleMsgFromNetwLayer(msg);
 }
 

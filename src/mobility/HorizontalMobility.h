@@ -19,6 +19,8 @@
 #include "MiXiMDefs.h"
 #include "BaseMobility.h"
 #include "GlobalControlUnit.h"
+#include "FindModule.h"
+
 class HorizontalMobility: public BaseMobility {
 public:
     HorizontalMobility();
@@ -39,14 +41,18 @@ public:
     virtual void initialize(int);
 
 protected:
+
     /** @brief Move the host*/
     virtual void makeMove();
 
     virtual void fixIfHostGetsOutside();
 
 protected:
-    // protected members
     GlobalControlUnit* gcu;
+
+private:
+
+    GlobalControlUnit* getGCU();
 };
 
 #endif /* HORIZONTALMOBILITY_H_ */

@@ -17,25 +17,27 @@
 #define __SIMPLEVEINS_COOPERATIVEDOWNLOAD_H_
 
 #include <omnetpp.h>
-#include "BaseApplLayer.h"
-#include "FindModule.h"
-#include "CooperativeDownloadMsg_m.h"
+#include "BaseGlobalAppLayer.h"
+#include "SegmentQueue.h"
+#include "CoDownMsg_m.h"
 
 /**
  * TODO - Generated class
  */
-class CooperativeDownload: public BaseApplLayer {
+#define CD_SQUEUE_MAP std::map<int,SegmentQueue*>
+class CooperativeDownload: public BaseGlobalAppLayer {
 public:
     CooperativeDownload();
     virtual ~CooperativeDownload();
-protected:
-    virtual void initialize();
-
+public:
+    virtual void initialize(int stage);
 public:
     void handleSelfMsg(cMessage *msg);
+    void handleLowerControl(cMessage *msg);
     void handleLowerMsg(cMessage *msg);
-
 private:
+    void selfReset();
+    CD_SQUEUE_MAP contentQueueMap;
 };
 
 #endif

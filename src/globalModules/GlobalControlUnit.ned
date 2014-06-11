@@ -20,6 +20,10 @@ package simpleveins.globalModules;
 //
 simple GlobalControlUnit
 {
+    parameters:
+        double sendPower @unit(m) = default(125m);
+        double receivePower @unit(m) = default(125m);
+        
     gates:
         input upperLayerIn; // to upper layers
         output upperLayerOut; // from upper layers

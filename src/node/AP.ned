@@ -28,6 +28,10 @@ import simpleveins.globalModules.GlobalControlUnit;
 module AP
 {
     parameters:
+        double x; 
+        double y; 
+        double z; 
+        
     gates:
         input radioIn; // gate for sendDirect
     submodules:
@@ -38,10 +42,6 @@ module AP
         appl: CooperativeDownloadAP {
             parameters:
                 @display("p=60,50");
-        }
-        mobility: ConstSpeedMobility {
-            parameters:
-                @display("p=130,50;i=block/cogwheel");
         }
     connections:
         gcu.upperLayerOut --> appl.lowerLayerIn;

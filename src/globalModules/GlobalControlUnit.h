@@ -21,6 +21,7 @@
 #include "IGlobalControlUnit.h"
 #include "FindModule.h"
 #include "Coord.h"
+#include "CoDownMsg_m.h"
 
 /**
  * TODO - Generated class

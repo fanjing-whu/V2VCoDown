@@ -51,11 +51,12 @@ public:
         }
     }
     virtual void connectToAP(int apid) {
+        ASSERT2(m_hasAp == false, "Error: Cannot disconnect form this AP, since this GCU has already connect to an AP.");
         m_hasAp = true;
         this->m_apid = apid;
     }
     virtual void disconnectFromAP(int apid) {
-        ASSERT2(this->m_apid == apid, "Error: Cannot disconnect form this AP, since this GCU dose not connect to it.");
+        ASSERT2(m_hasAp == true && this->m_apid == apid, "Error: Cannot disconnect form this AP, since this GCU dose not connect to it.");
         m_hasAp = false;
         this->m_apid = 0;
     }

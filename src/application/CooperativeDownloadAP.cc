@@ -23,9 +23,16 @@ CooperativeDownloadAP::CooperativeDownloadAP() {
 CooperativeDownloadAP::~CooperativeDownloadAP() {
 }
 
-void CooperativeDownloadAP::initialize()
+void CooperativeDownloadAP::initialize(int stage)
 {
-    // TODO - Generated method body
+    BaseGlobalAppLayer::initialize(stage);
+    if(stage == 0){
+        gcu->setAddr(getId());
+        gcu->isAp(true);
+        gcu->apid(getIndex());
+    }else if(stage == 1){
+
+    }
 }
 
 void CooperativeDownloadAP::handleSelfMsg(cMessage* msg) {

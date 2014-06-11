@@ -23,12 +23,49 @@ CooperativeDownload::CooperativeDownload() {
 CooperativeDownload::~CooperativeDownload() {
 }
 
-void CooperativeDownload::initialize()
+void CooperativeDownload::initialize(int stage)
 {
-    // TODO - Generated method body
+    BaseGlobalAppLayer::initialize(stage);
+    if(stage == 0){
+        gcu->setAddr(getId());
+        gcu->isAp(false);
+        gcu->apid(-1);
+    }else if(stage == 1){
+    }
 }
 
 void CooperativeDownload::handleSelfMsg(cMessage* msg) {
+}
+
+void CooperativeDownload::handleLowerControl(cMessage* msg) {
+    CoDownBaseMsg* cdmsg =check_and_cast<CoDownBaseMsg*>(msg);
+    switch(cdmsg->getMsgType()){
+    case CDCMT_ConnectToAP:
+        EV<<"CooperativeDownload::handleLowerMsg::CDCMT_ConnectToAP"<<endl;
+        break;
+    case CDCMT_ConnectToGCU:
+        EV<<"CooperativeDownload::handleLowerMsg::CDCMT_ConnectToGCU"<<endl;
+        break;
+    case CDCMT_DisconnectFromAP:
+        EV<<"CooperativeDownload::handleLowerMsg::CDCMT_DisconnectFromAP"<<endl;
+        break;
+    case CDCMT_DisconnectFromGCU:
+        EV<<"CooperativeDownload::handleLowerMsg::CDCMT_DisconnectFromGCU"<<endl;
+        break;
+    case CDCMT_DisconnectAll:
+        EV<<"CooperativeDownload::handleLowerMsg::CDCMT_DisconnectAll"<<endl;
+        selfReset();
+        break;
+    case CDCMT_UpdatePostion:
+        EV<<"CooperativeDownload::handleLowerMsg::CDCMT_UpdatePostion"<<endl;
+        break;
+    default:
+        delete msg;
+        break;
+    }
+}
+
+void CooperativeDownload::selfReset() {
 }
 
 void CooperativeDownload::handleLowerMsg(cMessage* msg) {

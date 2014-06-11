@@ -18,7 +18,12 @@
 Define_Module(GlobalControlUnit);
 
 GlobalControlUnit::GlobalControlUnit()
-    :gnl(NULL),myAddress(0)
+    :upperLayerIn(0),
+     upperLayerOut(0),
+     upperControlIn(0),
+     upperControlOut(0),
+     gnl(NULL),
+     myAddress(0)
 {
 }
 
@@ -38,6 +43,11 @@ void GlobalControlUnit::initialize(int stage)
         upperLayerOut = findGate("upperLayerOut");
         upperControlIn  = findGate("upperControlIn");
         upperControlOut = findGate("upperControlOut");
+
+        receivePower = par("receivePower");
+        sendPower = par("sendPower");
+    }else if( stage ==1){
+        gnl->registerGCU(this);
     }
 }
 
@@ -69,23 +79,30 @@ void GlobalControlUnit::handleMessage(cMessage *msg)
     }
 }
 
-void GlobalControlUnit::sendUp(cMessage *msg) {
-    send(msg, upperLayerOut);
-}
 
 void GlobalControlUnit::finish() {
+    gnl->unregisterGCU(this);
 }
 
 Coord GlobalControlUnit::getCurrentPostion(){
+    Enter_Method_Silent();
     return lastPos;
 }
 
 void GlobalControlUnit::setCurrentPostion(Coord pos) {
+    Enter_Method_Silent();
     lastPos = pos;
+    {
+        CoDownCtrlMsg* msg = new CoDownCtrlMsg();
+        msg->setMsgType(CDCMT_UpdatePostion);
+        msg->setId(getAddr());
+        sendControlUp(msg);
+    }
     gnl->refreshGCU(this);
 }
 
 void GlobalControlUnit::sendMsgToAP(int apid, cMessage* msg) {
+    Enter_Method_Silent();
     gnl->sendMsgToAP(apid, msg);
 }
 
@@ -104,39 +121,100 @@ void GlobalControlUnit::handleUpperControl(cMessage* msg) {
 }
 
 int GlobalControlUnit::getAddr() {
-    return myAddress;
+    Enter_Method_Silent();
+    if(isAp()){
+        return apid();
+    }else{
+        return myAddress;
+    }
 }
 
 void GlobalControlUnit::handleMsgFromNetwLayer(cMessage* msg) {
+    Enter_Method_Silent();
     sendUp(msg);
 }
 
 void GlobalControlUnit::setAddr(int addr) {
+    Enter_Method_Silent();
     this->myAddress = addr;
 }
 
 void GlobalControlUnit::connectToGCU(IGlobalControlUnit* gcu) {
-    IGlobalControlUnit::connectToGCU(gcu);
-
+    Enter_Method_Silent();
+    neighbors[gcu->getAddr()] = gcu;
+    {
+        CoDownCtrlMsg* msg = new CoDownCtrlMsg();
+        msg->setMsgType(CDCMT_ConnectToGCU);
+        msg->setId(getAddr());
+        sendControlUp(msg);
+    }
 }
 
 void GlobalControlUnit::disconnectFromGCU(IGlobalControlUnit* gcu) {
+    Enter_Method_Silent();
+    if (neighbors.erase(gcu->getAddr()) > 0) {
+        gcu->disconnectFromGCU(this);
+        {
+            CoDownCtrlMsg* msg = new CoDownCtrlMsg();
+            msg->setMsgType(CDCMT_DisconnectFromGCU);
+            msg->setId(getAddr());
+            sendControlUp(msg);
+        }
+    }
 }
 
 void GlobalControlUnit::disconnectAll() {
+    Enter_Method_Silent();
+    for (GCU_IGCU_MAP::iterator it = neighbors.begin();it != neighbors.end(); it++) {
+        this->disconnectFromGCU(it->second);
+    }
+    {
+        CoDownCtrlMsg* msg = new CoDownCtrlMsg();
+        msg->setMsgType(CDCMT_DisconnectAll);
+        msg->setId(-1);
+        sendControlUp(msg);
+    }
 }
 
 void GlobalControlUnit::connectToAP(int apid) {
+    Enter_Method_Silent();
+    ASSERT2(m_hasAp == false,
+            "Error: Cannot disconnect form this AP, since this GCU has already connect to an AP.");
+    m_hasAp = true;
+    this->m_apid = apid;
+    {
+        CoDownCtrlMsg* msg = new CoDownCtrlMsg();
+        msg->setMsgType(CDCMT_ConnectToAP);
+        msg->setId(apid);
+        sendControlUp(msg);
+    }
 }
 
 void GlobalControlUnit::disconnectFromAP(int apid) {
+    Enter_Method_Silent();
+    ASSERT2(m_hasAp == true && this->m_apid == apid,
+            "Error: Cannot disconnect form this AP, since this GCU dose not connect to it.");
+    m_hasAp = false;
+    this->m_apid = 0;
+    {
+        CoDownCtrlMsg* msg = new CoDownCtrlMsg();
+        msg->setMsgType(CDCMT_DisconnectFromAP);
+        msg->setId(apid);
+        sendControlUp(msg);
+    }
 }
 
+void GlobalControlUnit::sendUp(cMessage *msg) {
+    ASSERT2(gate(upperLayerOut)->isPathOK(),
+            "GlobalControlUnit: upperLayerOut is not connected");
+    send(msg, upperLayerOut);
+}
 void GlobalControlUnit::sendControlUp(cMessage *msg) {
     if (gate(upperControlOut)->isPathOK())
         send(msg, upperControlOut);
     else {
-        EV << "BaseLayer: upperControlOut is not connected; dropping message" << std::endl;
+        EV << "GlobalControlUnit: upperControlOut is not connected; dropping message" << std::endl;
         delete msg;
     }
 }
+

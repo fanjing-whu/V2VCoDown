@@ -32,6 +32,12 @@ enum CoDownMsgType{
 	CDMT_Negative = 7;	// 
 	CDMT_Acative = 8;	// 
 	CDMT_Quit = 9;
+	CDCMT_ConnectToGCU = 10;
+	CDCMT_ConnectToAP = 11;
+	CDCMT_DisconnectFromGCU = 12;
+	CDCMT_DisconnectFromAP = 13;
+	CDCMT_DisconnectAll = 14;
+	CDCMT_UpdatePostion = 15;
 }
 packet CoDownBaseMsg extends ApplPkt {
     int msgType @enum(CoDownMsgType);
@@ -45,13 +51,6 @@ packet CoDownContentMsg extends CoDownBaseMsg{
     int endPos;
     bool lastMsg;
 }
-enum CoDownCtrlMsgType{
-	CDCMT_ConnectToGCU = 0;
-	CDCMT_ConnectToAP = 1;
-	CDCMT_DisconnectFromGCU = 2;
-	CDCMT_DisconnectFromAP = 3;
-}
-packet CoDownCtrlMsg{
-    int msgType @enum(CoDownCtrlMsgType);
+packet CoDownCtrlMsg extends CoDownBaseMsg{
     int id;
 }

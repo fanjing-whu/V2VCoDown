@@ -18,22 +18,22 @@
 
 #include <omnetpp.h>
 #include <map>
-#include "BaseApplLayer.h"
-#include "FindModule.h"
+#include "BaseGlobalAppLayer.h"
 #include "SegmentQueue.h"
+#include "CoDownMsg_m.h"
 
 
 /**
  * TODO - Generated class
  */
 #define CDAP_SQUEUE_MAP std::map<int,SegmentQueue*>
-class CooperativeDownloadAP : public BaseApplLayer
+class CooperativeDownloadAP : public BaseGlobalAppLayer
 {
 public:
     CooperativeDownloadAP();
     virtual ~CooperativeDownloadAP();
 protected:
-    virtual void initialize();
+    virtual void initialize(int stage);
 
 public:
     void handleSelfMsg(cMessage *msg);

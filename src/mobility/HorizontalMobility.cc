@@ -44,6 +44,7 @@ void HorizontalMobility::initialize(int stage)
         move.setSpeed(speed);
 
         acceleration = par("acceleration");
+        gcu = getGCU();
     }
     else if(stage == 1){
         stepTarget = move.getStartPos();
@@ -64,14 +65,12 @@ void HorizontalMobility::initialize(int stage)
 void HorizontalMobility::fixIfHostGetsOutside()
 {
     Coord dummy = Coord(playgroundSizeX()-move.getStartPos().x,playgroundSizeY()/2);
-    handleIfOutside(WRAP, stepTarget, dummy, dummy, angle);
+
+    if(handleIfOutside(WRAP, stepTarget, dummy, dummy, angle)){
+        gcu->disconnectAll();
+    }
 }
 
-
-/**
- * Move the host if the destination is not reached yet. Otherwise
- * calculate a new random position
- */
 void HorizontalMobility::makeMove()
 {
     debugEV << "start makeMove " << move.info() << endl;
@@ -93,5 +92,11 @@ void HorizontalMobility::makeMove()
     move.setSpeed(nextSpeed);
 
     fixIfHostGetsOutside();
+
+    gcu->setCurrentPostion(move.getStartPos());
 }
 
+
+GlobalControlUnit* HorizontalMobility::getGCU() {
+    return FindModule<GlobalControlUnit*>::findSubModule(this->getParentModule());
+}
