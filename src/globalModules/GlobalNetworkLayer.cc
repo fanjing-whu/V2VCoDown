@@ -73,9 +73,9 @@ void GlobalNetworkLayer::refreshGCU(IGlobalControlUnit* gcu) {
         sortGCUList();
         // find this GCU
         GNL_IGCU_LIST::iterator thisGCU;
-        for (thisGCU = gcuSortedList.begin(); gcu != *thisGCU; thisGCU++) {
-            ASSERT2(thisGCU != gcuSortedList.end(), "Error: this GCU is unregistered.");
+        for (thisGCU = gcuSortedList.begin(); thisGCU != gcuSortedList.end()&&gcu->getAddr() != (*thisGCU)->getAddr(); thisGCU++) {
         }
+        ASSERT2(thisGCU != gcuSortedList.end(), "Error: this GCU is unregistered.");
         //connect to the front GCU
         GNL_IGCU_LIST::iterator it = thisGCU;
         for(it++;it!=gcuSortedList.end()&&gcu->isInRange(*it);it++){
