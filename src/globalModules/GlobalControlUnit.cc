@@ -46,7 +46,7 @@ void GlobalControlUnit::initialize(int stage)
 
         receivePower = par("receivePower");
         sendPower = par("sendPower");
-    }else if( stage ==1){
+    }else if( stage == 1){
         gnl->registerGCU(this);
     }
 }

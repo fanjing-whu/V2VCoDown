@@ -35,6 +35,7 @@ void HorizontalMobility::initialize(int stage)
     debugEV << "initializing HorizontalMobility stage " << stage << endl;
 
     if (stage == 0){
+        gcu = getGCU();
         angle = par("angle").doubleValue();
         speed = par("speed").doubleValue();
         speedOffset = par("speedOffset").doubleValue();
@@ -44,7 +45,6 @@ void HorizontalMobility::initialize(int stage)
         move.setSpeed(speed);
 
         acceleration = par("acceleration");
-        gcu = getGCU();
     }
     else if(stage == 1){
         stepTarget = move.getStartPos();

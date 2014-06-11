@@ -31,6 +31,7 @@ public:
     GlobalControlUnit();
     virtual ~GlobalControlUnit();
 protected:
+    virtual int numInitStages() const  {return 2;}
     virtual void initialize(int stage);
     virtual void handleMessage(cMessage *msg);
     virtual void finish();

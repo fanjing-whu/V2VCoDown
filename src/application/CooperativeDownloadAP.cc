@@ -31,7 +31,6 @@ void CooperativeDownloadAP::initialize(int stage)
         gcu->isAp(true);
         gcu->apid(getIndex());
     }else if(stage == 1){
-
     }
 }
 

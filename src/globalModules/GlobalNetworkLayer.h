@@ -21,7 +21,6 @@
 #include <list>
 #include "IGlobalControlUnit.h"
 #include "IGlobalNetworkLayer.h"
-#include "SimpleAddress.h"
 #include "ApplPkt_m.h"
 /**
  * TODO - Generated class

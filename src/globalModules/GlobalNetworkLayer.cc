@@ -61,7 +61,7 @@ void GlobalNetworkLayer::refreshGCU(IGlobalControlUnit* gcu) {
     Enter_Method_Silent();
     //disconnect the out-range GCU
     {
-        GNL_IGCU_MAP oldNeighbors = GNL_IGCU_MAP(*(gcu->getNeighbors()));
+        GNL_IGCU_MAP oldNeighbors = GNL_IGCU_MAP((*(gcu->getNeighbors())));
         for(GNL_IGCU_MAP::iterator it = oldNeighbors.begin();it!=oldNeighbors.end();it++){
             if(!gcu->isInRange(it->second)){
                 gcu->disconnectFromGCU(it->second);
@@ -85,7 +85,7 @@ void GlobalNetworkLayer::refreshGCU(IGlobalControlUnit* gcu) {
         }
         //connect to the behind GCU
         it = thisGCU;
-        for(it--;it!=gcuSortedList.begin()&&gcu->isInRange(*it);it++){
+        for(it--;it!=gcuSortedList.begin()&&gcu->isInRange(*it);it--){
             if(!gcu->isConnectedTo(*it)){
                 gcu->connectToGCU(*it);
             }
@@ -96,11 +96,14 @@ void GlobalNetworkLayer::refreshGCU(IGlobalControlUnit* gcu) {
         GNL_IGCU_MAP::iterator it;
         for (it = apMap.begin();; it++) {
             if( it==apMap.end()) {
-                gcu->disconnectFromAP(gcu->apid());
+                if(gcu->hasAp()){
+                    gcu->disconnectFromAP(gcu->apid());
+                }
                 break;
             }else if(gcu->isInRange(it->second)){
                 ASSERT2(!gcu->hasAp()||gcu->apid()==it->second->apid(), "Error: this GCU already has an other AP connected.");
                 gcu->connectToAP(it->second->apid());
+                break;
             }
         }
     }
