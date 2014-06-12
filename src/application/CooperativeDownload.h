@@ -36,8 +36,16 @@ public:
     void handleLowerControl(cMessage *msg);
     void handleLowerMsg(cMessage *msg);
 private:
+    void sayHelloToAp(int apid);
+    void sayByeToAp(int apid);
     void selfReset();
     CD_SQUEUE_MAP contentQueueMap;
+
+    bool coreDebug;
+    bool debug;
+
+    bool isTargetCar;
+    double taskSize;
 };
 
 #endif

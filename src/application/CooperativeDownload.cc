@@ -27,9 +27,15 @@ void CooperativeDownload::initialize(int stage)
 {
     BaseGlobalAppLayer::initialize(stage);
     if(stage == 0){
+        // initialize the gcu module
         gcu->setAddr(getParentModule()->getId());
         gcu->isAp(false);
         gcu->apid(-1);
+        // initialize other parameters
+        coreDebug = par("coreDebug").boolValue();
+        debug = par("debug").boolValue();
+        isTargetCar = par("isTargetCar").boolValue();
+        taskSize = par("taskSize").doubleValue();
     }else if(stage == 1){
     }
 }
@@ -40,29 +46,44 @@ void CooperativeDownload::handleSelfMsg(cMessage* msg) {
 void CooperativeDownload::handleLowerControl(cMessage* msg) {
     CoDownCtrlMsg* cdmsg =check_and_cast<CoDownCtrlMsg*>(msg);
     if(cdmsg == NULL){
-        EV<<"Error: CooperativeDownload::get a wrong type message."<< endl;
+        debugEV <<"Error: CooperativeDownload::get a wrong type message."
+                << endl;
     }
     switch(cdmsg->getMsgType()){
     case CDCMT_ConnectToAP:
-        EV<<"CooperativeDownload::handleLowerMsg::CDCMT_ConnectToAP: "<<endl;
+        debugEV <<"CooperativeDownload::handleLowerMsg::CDCMT_ConnectToAP: "
+                << cdmsg->getTargetId()
+                <<endl;
+        // TODO
         break;
     case CDCMT_ConnectToGCU:
-        EV<<"CooperativeDownload::handleLowerMsg::CDCMT_ConnectToGCU"<<endl;
+        debugEV <<"CooperativeDownload::handleLowerMsg::CDCMT_ConnectToGCU: "
+                << cdmsg->getTargetId()
+                <<endl;
+        // TODO
         break;
     case CDCMT_DisconnectFromAP:
-        EV<<"CooperativeDownload::handleLowerMsg::CDCMT_DisconnectFromAP"<<endl;
+        debugEV <<"CooperativeDownload::handleLowerMsg::CDCMT_DisconnectFromAP: "
+                << cdmsg->getTargetId()
+                <<endl;
+        // TODO
         break;
     case CDCMT_DisconnectFromGCU:
-        EV<<"CooperativeDownload::handleLowerMsg::CDCMT_DisconnectFromGCU"<<endl;
+        debugEV <<"CooperativeDownload::handleLowerMsg::CDCMT_DisconnectFromGCU: "
+                << cdmsg->getTargetId()
+                <<endl;
+        // TODO
         break;
     case CDCMT_DisconnectAll:
-        EV<<"CooperativeDownload::handleLowerMsg::CDCMT_DisconnectAll"<<endl;
+        debugEV <<"CooperativeDownload::handleLowerMsg::CDCMT_DisconnectAll"
+                <<endl;
         selfReset();
         delete msg;
         msg = NULL;
         break;
     case CDCMT_UpdatePostion:
-        EV<<"CooperativeDownload::handleLowerMsg::CDCMT_UpdatePostion"<<endl;
+        debugEV <<"CooperativeDownload::handleLowerMsg::CDCMT_UpdatePostion"
+                <<endl;
         break;
     default:
         delete msg;

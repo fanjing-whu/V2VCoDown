@@ -342,7 +342,7 @@ double SegmentQueue::length() {
     return result;
 }
 
-segmentQueue* SegmentQueue::getFirstSegment() {
+SegmentQueue* SegmentQueue::getFirstSegment() {
     double start = 0;
     double end = 0;
     for(SQueue::iterator it = sq.begin(); it!=sq.end(); it++){

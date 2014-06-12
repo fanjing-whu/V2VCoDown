@@ -95,7 +95,7 @@ void GlobalControlUnit::setCurrentPostion(Coord pos) {
     {
         CoDownCtrlMsg* msg = new CoDownCtrlMsg();
         msg->setMsgType(CDCMT_UpdatePostion);
-        msg->setId(getAddr());
+        msg->setTargetId(getAddr());
         sendControlUp(msg);
     }
     gnl->refreshGCU(this);
@@ -145,7 +145,7 @@ void GlobalControlUnit::connectToGCU(IGlobalControlUnit* gcu) {
     {
         CoDownCtrlMsg* msg = new CoDownCtrlMsg();
         msg->setMsgType(CDCMT_ConnectToGCU);
-        msg->setId(getAddr());
+        msg->setTargetId(getAddr());
         sendControlUp(msg);
     }
 }
@@ -157,7 +157,7 @@ void GlobalControlUnit::disconnectFromGCU(IGlobalControlUnit* gcu) {
         {
             CoDownCtrlMsg* msg = new CoDownCtrlMsg();
             msg->setMsgType(CDCMT_DisconnectFromGCU);
-            msg->setId(getAddr());
+            msg->setTargetId(getAddr());
             sendControlUp(msg);
         }
     }
@@ -175,7 +175,7 @@ void GlobalControlUnit::disconnectAll() {
     {
         CoDownCtrlMsg* msg = new CoDownCtrlMsg();
         msg->setMsgType(CDCMT_DisconnectAll);
-        msg->setId(-1);
+        msg->setTargetId(-1);
         sendControlUp(msg);
     }
 }
@@ -189,7 +189,7 @@ void GlobalControlUnit::connectToAP(int apid) {
     {
         CoDownCtrlMsg* msg = new CoDownCtrlMsg();
         msg->setMsgType(CDCMT_ConnectToAP);
-        msg->setId(apid);
+        msg->setTargetId(apid);
         sendControlUp(msg);
     }
 }
@@ -203,7 +203,7 @@ void GlobalControlUnit::disconnectFromAP(int apid) {
     {
         CoDownCtrlMsg* msg = new CoDownCtrlMsg();
         msg->setMsgType(CDCMT_DisconnectFromAP);
-        msg->setId(apid);
+        msg->setTargetId(apid);
         sendControlUp(msg);
     }
 }

@@ -24,7 +24,9 @@ simple CooperativeDownload like IBaseApplLayer
     parameters:
         bool coreDebug  = default(false); //debug switch for base class (TestApplLayer)
     	bool debug      = default(false); // debug switch
-    	int  headerLength @unit("bit");   // length of the application message header (in bits)
+    	int  headerLength @unit("bit") = default(10bit);   // length of the application message header (in bits)
+    	bool isTargetCar = default(false);
+    	double taskSize @unit("kb") = default(1024kb);
     gates:
     	input lowerLayerIn; // from network layer
         output lowerLayerOut; // to network layer
