@@ -36,7 +36,10 @@ void CooperativeDownload::initialize(int stage)
         debug = par("debug").boolValue();
         isTargetCar = par("isTargetCar").boolValue();
         taskSize = par("taskSize").doubleValue();
+
+        status = CAR_IDEL;
     }else if(stage == 1){
+
     }
 }
 

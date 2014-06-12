@@ -46,6 +46,13 @@ private:
 
     bool isTargetCar;
     double taskSize;
+
+    enum CarStatus{
+        CAR_IDEL = 0,
+        CAR_BUSY = 1
+    };
+
+    CarStatus status;
 };
 
 #endif
