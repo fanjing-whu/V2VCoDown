@@ -296,6 +296,12 @@ void SegmentQueue::output() {
     std::cout<<std::endl;
 }
 
+SegmentQueue* SegmentQueue::copy() {
+}
+
+void SegmentQueue::clean() {
+}
+
 void SegmentQueue::init(double start, double end) {
     SQueue::iterator it = sq.begin();
     if(it!=sq.end()){

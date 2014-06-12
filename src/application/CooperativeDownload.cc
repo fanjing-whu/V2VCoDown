@@ -27,7 +27,7 @@ void CooperativeDownload::initialize(int stage)
 {
     BaseGlobalAppLayer::initialize(stage);
     if(stage == 0){
-        gcu->setAddr(getId());
+        gcu->setAddr(getParentModule()->getId());
         gcu->isAp(false);
         gcu->apid(-1);
     }else if(stage == 1){
@@ -39,6 +39,9 @@ void CooperativeDownload::handleSelfMsg(cMessage* msg) {
 
 void CooperativeDownload::handleLowerControl(cMessage* msg) {
     CoDownBaseMsg* cdmsg =check_and_cast<CoDownBaseMsg*>(msg);
+    if(cdmsg == NULL){
+        EV<<"Error: CooperativeDownload::get a wrong type message."<< endl;
+    }
     switch(cdmsg->getMsgType()){
     case CDCMT_ConnectToAP:
         EV<<"CooperativeDownload::handleLowerMsg::CDCMT_ConnectToAP"<<endl;
@@ -55,17 +58,21 @@ void CooperativeDownload::handleLowerControl(cMessage* msg) {
     case CDCMT_DisconnectAll:
         EV<<"CooperativeDownload::handleLowerMsg::CDCMT_DisconnectAll"<<endl;
         selfReset();
+        delete msg;
+        msg = NULL;
         break;
     case CDCMT_UpdatePostion:
         EV<<"CooperativeDownload::handleLowerMsg::CDCMT_UpdatePostion"<<endl;
         break;
     default:
         delete msg;
+        msg = NULL;
         break;
     }
 }
 
 void CooperativeDownload::selfReset() {
+
 }
 
 void CooperativeDownload::handleLowerMsg(cMessage* msg) {

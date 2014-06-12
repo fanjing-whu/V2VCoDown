@@ -32,11 +32,12 @@ private:
 public:
     void remove(SegmentQueue& sq);
     void add(SegmentQueue& sq);
+    SegmentQueue* copy();
+    void clean();
     void output();
 private:
     void removeNode(SQueue::iterator &it);
     void addNode(SQueue::iterator &it, double value, bool flag);
-
     void init(double start, double end);
 
     inline bool operator_remove(bool lhs, bool rhs) {

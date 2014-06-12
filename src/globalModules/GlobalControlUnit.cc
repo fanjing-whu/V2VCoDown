@@ -169,6 +169,10 @@ void GlobalControlUnit::disconnectAll() {
         this->disconnectFromGCU(it->second);
     }
     {
+        m_hasAp = false;
+        this->m_apid = -1;
+    }
+    {
         CoDownCtrlMsg* msg = new CoDownCtrlMsg();
         msg->setMsgType(CDCMT_DisconnectAll);
         msg->setId(-1);
@@ -195,7 +199,7 @@ void GlobalControlUnit::disconnectFromAP(int apid) {
     ASSERT2(m_hasAp == true && this->m_apid == apid,
             "Error: Cannot disconnect form this AP, since this GCU dose not connect to it.");
     m_hasAp = false;
-    this->m_apid = 0;
+    this->m_apid = -1;
     {
         CoDownCtrlMsg* msg = new CoDownCtrlMsg();
         msg->setMsgType(CDCMT_DisconnectFromAP);

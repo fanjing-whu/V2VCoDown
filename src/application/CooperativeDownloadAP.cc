@@ -27,9 +27,9 @@ void CooperativeDownloadAP::initialize(int stage)
 {
     BaseGlobalAppLayer::initialize(stage);
     if(stage == 0){
-        gcu->setAddr(getId());
+        gcu->setAddr(getParentModule()->getId());
         gcu->isAp(true);
-        gcu->apid(getIndex());
+        gcu->apid(getParentModule()->getIndex());
     }else if(stage == 1){
     }
 }
