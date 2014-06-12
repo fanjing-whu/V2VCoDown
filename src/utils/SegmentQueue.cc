@@ -20,13 +20,11 @@ SegmentQueue::SegmentQueue() {
 }
 
 SegmentQueue::SegmentQueue(double start, double end) {
-	init(start, end);
+    init(start, end);
 }
 
 SegmentQueue::~SegmentQueue() {
-    for(SQueue::iterator it = sq.begin();it!=sq.end();){
-        removeNode(it);
-    }
+    this->clean();
 }
 
 void SegmentQueue::remove(SegmentQueue& sq) {
@@ -34,28 +32,31 @@ void SegmentQueue::remove(SegmentQueue& sq) {
     SQueue::iterator itSq = sq.sq.begin();
     bool flagThis = false;
     bool flagSq = false;
-    while(itSq!=sq.sq.end()&&itThis!=this->sq.end()){
-        if(!flagThis){
+    while (itSq != sq.sq.end() && itThis != this->sq.end()) {
+        if (!flagThis) {
             //0:--|
-            if(itThis == this->sq.end()){
-                std::cout<<"The loop should have been terminated in this situation."<<std::endl;
+            if (itThis == this->sq.end()) {
+                std::cout
+                        << "The loop should have been terminated"
+                        << " in this situation."
+                        << std::endl;
             }
-            if((*itThis)->value > (*itSq)->value){
-                if(flagSq){
+            if ((*itThis)->value > (*itSq)->value) {
+                if (flagSq) {
                     //0:-----|+
                     //1:+|-????
                     //r:-----|+
                     flagSq = (*itSq)->flag;
                     itSq++;
-                }else{
+                } else {
                     //0:-----|+
                     //1:-|+????
                     //r:-----|+
                     flagSq = (*itSq)->flag;
                     itSq++;
                 }
-            }else if((*itThis)->value == (*itSq)->value){
-                if(flagSq){
+            } else if ((*itThis)->value == (*itSq)->value) {
+                if (flagSq) {
                     //0:-|+
                     //1:+|-
                     //r:-|+
@@ -63,7 +64,7 @@ void SegmentQueue::remove(SegmentQueue& sq) {
                     itThis++;
                     flagSq = (*itSq)->flag;
                     itSq++;
-                }else{
+                } else {
                     //0:-|+
                     //1:-|+
                     //r:-|+
@@ -72,47 +73,53 @@ void SegmentQueue::remove(SegmentQueue& sq) {
                     flagSq = (*itSq)->flag;
                     itSq++;
                 }
-            }else if((*itThis)->value < (*itSq)->value){
-                if(flagSq){
+            } else if ((*itThis)->value < (*itSq)->value) {
+                if (flagSq) {
                     //0:-|+????
                     //1:+++++|-
                     //r:---????
                     flagThis = (*itThis)->flag;
                     removeNode(itThis);
-                }else{
+                } else {
                     //0:-|+????
                     //1:-----|+
                     //r:-|+????
                     flagThis = (*itThis)->flag;
                     itThis++;
                 }
-            }else{
-                std::cout<<"Error: This situation cannot happen."<<std::endl;
+            } else {
+                std::cout
+                        << "Error: This situation cannot happen."
+                        << std::endl;
             }
-        }else{
+        } else {
             //0:++|
-            if(itThis == this->sq.end()){
+            if (itThis == this->sq.end()) {
                 //0:++;
-                std::cout<<"Error: The flag cannot be true while itThis is the end of this segment queue ";
-                std::cout<<"and the loop should have been terminated in this situation."<<std::endl;
-            }else if((*itThis)->value > (*itSq)->value){
-                if(flagSq){
+                std::cout
+                        << "Error: The flag cannot be true "
+                        << "while itThis is the end of this segment queue "
+                        << "and the loop should have been terminated"
+                        << " in this situation."
+                        << std::endl;
+            } else if ((*itThis)->value > (*itSq)->value) {
+                if (flagSq) {
                     //0:+++++|-
                     //1:+|-????
                     //r:-|+++|-
-                    addNode(itThis,(*itSq)->value,true);
+                    addNode(itThis, (*itSq)->value, true);
                     flagSq = (*itSq)->flag;
                     itSq++;
-                }else{
+                } else {
                     //0:+++++|-
                     //1:-|+????
                     //r:+|-?+|-
-                    addNode(itThis,(*itSq)->value,false);
+                    addNode(itThis, (*itSq)->value, false);
                     flagSq = (*itSq)->flag;
                     itSq++;
                 }
-            }else if((*itThis)->value == (*itSq)->value){
-                if(flagSq){
+            } else if ((*itThis)->value == (*itSq)->value) {
+                if (flagSq) {
                     //0:+|-
                     //1:+|-
                     //r:---
@@ -120,7 +127,7 @@ void SegmentQueue::remove(SegmentQueue& sq) {
                     removeNode(itThis);
                     flagSq = (*itSq)->flag;
                     itSq++;
-                }else{
+                } else {
                     //0:+|-
                     //1:-|+
                     //r:+|-
@@ -129,22 +136,24 @@ void SegmentQueue::remove(SegmentQueue& sq) {
                     flagSq = (*itSq)->flag;
                     itSq++;
                 }
-            }else if((*itThis)->value < (*itSq)->value){
-                if(flagSq){
+            } else if ((*itThis)->value < (*itSq)->value) {
+                if (flagSq) {
                     //0:+|-????
                     //1:+++++|-
                     //r:---????
                     flagThis = (*itThis)->flag;
                     removeNode(itThis);
-                }else{
+                } else {
                     //0:+|-????
                     //1:-----|+
                     //r:+|-????
                     flagThis = (*itThis)->flag;
                     itThis++;
                 }
-            }else{
-                std::cout<<"Error: This situation cannot happen."<<std::endl;
+            } else {
+                std::cout
+                        << "Error: This situation cannot happen."
+                        << std::endl;
             }
         }
     }
@@ -155,18 +164,18 @@ void SegmentQueue::add(SegmentQueue &sq) {
     SQueue::iterator itSq = sq.sq.begin();
     bool flagThis = false;
     bool flagSq = false;
-    while(itSq!=sq.sq.end()){
-        if(!flagThis){
+    while (itSq != sq.sq.end()) {
+        if (!flagThis) {
             //0:--|
-            if(itThis == this->sq.end()){
-                if(flagSq){
+            if (itThis == this->sq.end()) {
+                if (flagSq) {
                     //0:-----;
                     //1:+|-???
                     //r:+|-?-;
-                    addNode(itThis,(*itSq)->value,(*itSq)->flag);
+                    addNode(itThis, (*itSq)->value, (*itSq)->flag);
                     flagSq = (*itSq)->flag;
                     itSq++;
-                }else{
+                } else {
                     //0:-----;
                     //1:-|+???
                     //r:-|+?-;
@@ -174,15 +183,15 @@ void SegmentQueue::add(SegmentQueue &sq) {
                     flagSq = (*itSq)->flag;
                     itSq++;
                 }
-            }else if((*itThis)->value > (*itSq)->value){
-                if(flagSq){
+            } else if ((*itThis)->value > (*itSq)->value) {
+                if (flagSq) {
                     //0:-----|+
                     //1:+|-????
                     //r:+|-?-|+
-                    addNode(itThis,(*itSq)->value,(*itSq)->flag);
+                    addNode(itThis, (*itSq)->value, (*itSq)->flag);
                     flagSq = (*itSq)->flag;
                     itSq++;
-                }else{
+                } else {
                     //0:-----|+
                     //1:-|+????
                     //r:-|+?-|+
@@ -190,8 +199,8 @@ void SegmentQueue::add(SegmentQueue &sq) {
                     flagSq = (*itSq)->flag;
                     itSq++;
                 }
-            }else if((*itThis)->value == (*itSq)->value){
-                if(flagSq){
+            } else if ((*itThis)->value == (*itSq)->value) {
+                if (flagSq) {
                     //0:-|+
                     //1:+|-
                     //r:+++
@@ -199,7 +208,7 @@ void SegmentQueue::add(SegmentQueue &sq) {
                     removeNode(itThis);
                     flagSq = (*itSq)->flag;
                     itSq++;
-                }else{
+                } else {
                     //0:-|+
                     //1:-|+
                     //r:-|+
@@ -208,44 +217,49 @@ void SegmentQueue::add(SegmentQueue &sq) {
                     flagSq = (*itSq)->flag;
                     itSq++;
                 }
-            }else if((*itThis)->value < (*itSq)->value){
-                if(flagSq){
+            } else if ((*itThis)->value < (*itSq)->value) {
+                if (flagSq) {
                     //0:-|+????
                     //1:+++++|-
                     //r:+++????
                     flagThis = (*itThis)->flag;
                     removeNode(itThis);
-                }else{
+                } else {
                     //0:-|+????
                     //1:-----|+
                     //r:-|+????
                     flagThis = (*itThis)->flag;
                     itThis++;
                 }
-            }else{
-                std::cout<<"Error: This situation cannot happen."<<std::endl;
+            } else {
+                std::cout
+                        << "Error: This situation cannot happen."
+                        << std::endl;
             }
-        }else{
+        } else {
             //0:++|
-            if(itThis == this->sq.end()){
+            if (itThis == this->sq.end()) {
                 //0:++;
-                std::cout<<"Error: The flag cannot be true while itThis is the end of this segment queue."<<std::endl;
-            }else if((*itThis)->value > (*itSq)->value){
-                if(flagSq){
+                std::cout
+                        << "Error: The flag cannot be true"
+                        << " while itThis is the end of this segment queue."
+                        << std::endl;
+            } else if ((*itThis)->value > (*itSq)->value) {
+                if (flagSq) {
                     //0:+++++|-
                     //1:+|-????
                     //r:+++++|-
                     flagSq = (*itSq)->flag;
                     itSq++;
-                }else{
+                } else {
                     //0:+++++|-
                     //1:-|+????
                     //r:+++++|-
                     flagSq = (*itSq)->flag;
                     itSq++;
                 }
-            }else if((*itThis)->value == (*itSq)->value){
-                if(flagSq){
+            } else if ((*itThis)->value == (*itSq)->value) {
+                if (flagSq) {
                     //0:+|-
                     //1:+|-
                     //r:+|-
@@ -253,7 +267,7 @@ void SegmentQueue::add(SegmentQueue &sq) {
                     itThis++;
                     flagSq = (*itSq)->flag;
                     itSq++;
-                }else{
+                } else {
                     //0:+|-?
                     //1:-|+?
                     //r:+++?
@@ -262,58 +276,90 @@ void SegmentQueue::add(SegmentQueue &sq) {
                     flagSq = (*itSq)->flag;
                     itSq++;
                 }
-            }else if((*itThis)->value < (*itSq)->value){
-                if(flagSq){
+            } else if ((*itThis)->value < (*itSq)->value) {
+                if (flagSq) {
                     //0:+|-????
                     //1:+++++|-
                     //r:+++????
                     flagThis = (*itThis)->flag;
                     removeNode(itThis);
-                }else{
+                } else {
                     //0:+|-????
                     //1:-----|+
                     //r:+|-????
                     flagThis = (*itThis)->flag;
                     itThis++;
                 }
-            }else{
-                std::cout<<"Error: This situation cannot happen."<<std::endl;
+            } else {
+                std::cout
+                        << "Error: This situation cannot happen."
+                        << std::endl;
             }
         }
     }
 }
 
 void SegmentQueue::output() {
-    std::cout<<":";
-    for(SQueue::iterator it = sq.begin();it!=sq.end();it++){
-        std::cout<<(*it)->value;
-        if((*it)->flag){
-        	std::cout<<"+++";
-        }else{
-        	std::cout<<"---";
+    std::cout << ":";
+    for (SQueue::iterator it = sq.begin(); it != sq.end(); it++) {
+        std::cout << (*it)->value;
+        if ((*it)->flag) {
+            std::cout << "+++";
+        } else {
+            std::cout << "---";
         }
     }
-    std::cout<<std::endl;
+    std::cout << std::endl;
 }
 
 SegmentQueue* SegmentQueue::copy() {
+    SegmentQueue * copy = new SegmentQueue();
+//    for(SQueue::iterator it = sq.begin();it!=sq.end();it++){
+//        copy->addNode(copy->sq.end(),(*it)->value,(*it)->flag);
+//    }
+    copy->add(*this);
+    return copy;
 }
 
 void SegmentQueue::clean() {
+    for (SQueue::iterator it = sq.begin(); it != sq.end();) {
+        removeNode(it);
+    }
+}
+
+bool SegmentQueue::empty() {
+    return sq.begin()==sq.end();
+}
+
+double SegmentQueue::length() {
+    double result = 0;
+    double start = 0;
+
+    for (SQueue::iterator it = sq.begin(); it != sq.end();) {
+        if((*it)->flag){
+            start = (*it)->value;
+        }else{
+            result+=(*it)->value - start;
+        }
+    }
+    return result;
 }
 
 void SegmentQueue::init(double start, double end) {
     SQueue::iterator it = sq.begin();
-    if(it!=sq.end()){
-        std::cout<<"Error: You must call the INIT function before insert any other nodes."<<std::endl;
+    if (it != sq.end()) {
+        std::cout
+                << "Error: You must call the INIT function"
+                << " before insert any other nodes."
+                << std::endl;
         return;
     }
-    addNode(it,start,true);
-    addNode(it,end,false);
+    addNode(it, start, true);
+    addNode(it, end, false);
 }
 
 void SegmentQueue::removeNode(SQueue::iterator &it) {
-    delete((*it));
+    delete ((*it));
     // (*it) = NULL;
     it = sq.erase(it);
 }
@@ -322,5 +368,5 @@ void SegmentQueue::addNode(SQueue::iterator &it, double value, bool flag) {
     _Container* e = new _Container();
     e->value = value;
     e->flag = flag;
-    sq.insert(it,e);
+    sq.insert(it, e);
 }

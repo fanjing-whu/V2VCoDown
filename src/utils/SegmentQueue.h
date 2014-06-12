@@ -33,6 +33,8 @@ public:
     void remove(SegmentQueue& sq);
     void add(SegmentQueue& sq);
     SegmentQueue* copy();
+    bool empty();
+    double length();
     void clean();
     void output();
 private:
