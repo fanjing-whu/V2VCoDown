@@ -52,5 +52,5 @@ packet CoDownContentMsg extends CoDownBaseMsg{
     bool lastMsg;
 }
 packet CoDownCtrlMsg extends CoDownBaseMsg{
-    int id;
+    int targetId;
 }

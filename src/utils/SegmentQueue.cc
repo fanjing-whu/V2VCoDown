@@ -314,9 +314,6 @@ void SegmentQueue::output() {
 
 SegmentQueue* SegmentQueue::copy() {
     SegmentQueue * copy = new SegmentQueue();
-//    for(SQueue::iterator it = sq.begin();it!=sq.end();it++){
-//        copy->addNode(copy->sq.end(),(*it)->value,(*it)->flag);
-//    }
     copy->add(*this);
     return copy;
 }
@@ -335,7 +332,7 @@ double SegmentQueue::length() {
     double result = 0;
     double start = 0;
 
-    for (SQueue::iterator it = sq.begin(); it != sq.end();) {
+    for (SQueue::iterator it = sq.begin(); it != sq.end();it++) {
         if((*it)->flag){
             start = (*it)->value;
         }else{
@@ -343,6 +340,24 @@ double SegmentQueue::length() {
         }
     }
     return result;
+}
+
+segmentQueue* SegmentQueue::getFirstSegment() {
+    double start = 0;
+    double end = 0;
+    for(SQueue::iterator it = sq.begin(); it!=sq.end(); it++){
+        if ((*it)->flag) {
+            start = (*it)->value;
+        } else {
+            end = (*it)->value;
+            break;
+        }
+    }
+    if(end>start){
+        return new SegmentQueue(start,end);
+    }else{
+        return new SegmentQueue();
+    }
 }
 
 void SegmentQueue::init(double start, double end) {

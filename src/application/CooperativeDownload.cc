@@ -38,13 +38,13 @@ void CooperativeDownload::handleSelfMsg(cMessage* msg) {
 }
 
 void CooperativeDownload::handleLowerControl(cMessage* msg) {
-    CoDownBaseMsg* cdmsg =check_and_cast<CoDownBaseMsg*>(msg);
+    CoDownCtrlMsg* cdmsg =check_and_cast<CoDownCtrlMsg*>(msg);
     if(cdmsg == NULL){
         EV<<"Error: CooperativeDownload::get a wrong type message."<< endl;
     }
     switch(cdmsg->getMsgType()){
     case CDCMT_ConnectToAP:
-        EV<<"CooperativeDownload::handleLowerMsg::CDCMT_ConnectToAP"<<endl;
+        EV<<"CooperativeDownload::handleLowerMsg::CDCMT_ConnectToAP: "<<endl;
         break;
     case CDCMT_ConnectToGCU:
         EV<<"CooperativeDownload::handleLowerMsg::CDCMT_ConnectToGCU"<<endl;
@@ -72,7 +72,7 @@ void CooperativeDownload::handleLowerControl(cMessage* msg) {
 }
 
 void CooperativeDownload::selfReset() {
-
+    contentQueueMap.clear();
 }
 
 void CooperativeDownload::handleLowerMsg(cMessage* msg) {
