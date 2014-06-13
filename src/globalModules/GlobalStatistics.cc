@@ -34,7 +34,6 @@ GlobalStatistics::GlobalStatistics() {
 }
 
 GlobalStatistics::~GlobalStatistics() {
-    // TODO Auto-generated destructor stub
     for (GlobalStatisticsMap::iterator it = globalStatisticsMap.begin();
             it != globalStatisticsMap.end(); it++) {
         for (GlobalStatisticsList::iterator lit = it->second.begin();
@@ -45,7 +44,6 @@ GlobalStatistics::~GlobalStatistics() {
 }
 
 void GlobalStatistics::record(string name, int size, ...) {
-    // TODO Auto-generated destructor stub
     GlobalStatisticsMap::iterator it;
     GlobalStatisticsUnit *unit = new GlobalStatisticsUnit(size);
     double val;

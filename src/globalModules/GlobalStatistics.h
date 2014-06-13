@@ -26,7 +26,7 @@
 typedef std::list<GlobalStatisticsUnit> GlobalStatisticsList;
 typedef std::map<string, GlobalStatisticsList> GlobalStatisticsMap;
 /**
- * TODO - Generated class
+ *
  */
 class GlobalStatistics: public cSimpleModule {
 public:

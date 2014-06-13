@@ -24,7 +24,7 @@
 
 
 /**
- * TODO - Generated class
+ *
  */
 #define CDAP_SQUEUE_MAP std::map<int,SegmentQueue*>
 class CooperativeDownloadAP : public BaseGlobalAppLayer

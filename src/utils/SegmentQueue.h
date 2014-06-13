@@ -34,9 +34,13 @@ public:
     void add(SegmentQueue& sq);
     SegmentQueue* copy();
     SegmentQueue* getFirstSegment();
+    SegmentQueue* getFirstSegment(double length);
+    double getStartValue();
+    double getFirstStart();
+    double getFirstEnd();
     bool empty();
     double length();
-    void clean();
+    void clear();
     void output();
 private:
     void removeNode(SQueue::iterator &it);

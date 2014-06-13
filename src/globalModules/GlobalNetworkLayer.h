@@ -23,7 +23,7 @@
 #include "IGlobalNetworkLayer.h"
 #include "ApplPkt_m.h"
 /**
- * TODO - Generated class
+ *
  */
 #define GNL_IGCU_MAP std::map<int, IGlobalControlUnit*>
 #define GNL_IGCU_LIST std::list<IGlobalControlUnit*>

@@ -18,6 +18,7 @@
 Define_Module(CooperativeDownload);
 
 CooperativeDownload::CooperativeDownload() {
+    // TODO
 }
 
 CooperativeDownload::~CooperativeDownload() {
@@ -36,14 +37,44 @@ void CooperativeDownload::initialize(int stage)
         debug = par("debug").boolValue();
         isTargetCar = par("isTargetCar").boolValue();
         taskSize = par("taskSize").doubleValue();
+        frameSize = par("frameSize").doubleValue();
+        frameInterval = par("frameInterval").doubleValue();
+        frameTimer = new cMessage("frameTimer");
 
-        status = CAR_IDEL;
+        car_Status = CAR_IDEL;
     }else if(stage == 1){
 
     }
 }
 
 void CooperativeDownload::handleSelfMsg(cMessage* msg) {
+    if(msg == frameTimer){
+        if (car_Status == CAR_SENDING||car_Status == CAR_PRESENDING) {
+            // start sending data to target car
+            car_Status = CAR_SENDING;
+            SegmentQueue* content = contentQueueMap[targetID]->getFirstSegment(frameSize);
+            contentQueueMap[targetID]->remove(*content);
+            {
+                CoDownContentMsg* cdmsg = new CoDownContentMsg();
+                cdmsg->setMsgType(CDMT_Send);
+                cdmsg->setSrcAddr(gcu->getAddr());
+                cdmsg->setDestAddr(targetID);
+                cdmsg->setStartPos(content->getFirstStart());
+                cdmsg->setEndPos(content->getFirstEnd());
+                cdmsg->setLastMsg(contentQueueMap[targetID]->empty());
+                sendDown(cdmsg);
+            }
+            if(!contentQueueMap[targetID]->empty()){
+                scheduleAt(simTime()+frameInterval,frameTimer);
+            }
+        }else{
+            debugEV<<"Error: Start sending process from an unknown status."<<endl;
+        }
+        delete msg;
+    }else{
+        debugEV<<"Error: Unknown self message."<<endl;
+        delete msg;
+    }
 }
 
 void CooperativeDownload::handleLowerControl(cMessage* msg) {
@@ -51,53 +82,93 @@ void CooperativeDownload::handleLowerControl(cMessage* msg) {
     if(cdmsg == NULL){
         debugEV <<"Error: CooperativeDownload::get a wrong type message."
                 << endl;
-    }
-    switch(cdmsg->getMsgType()){
-    case CDCMT_ConnectToAP:
-        debugEV <<"CooperativeDownload::handleLowerMsg::CDCMT_ConnectToAP: "
-                << cdmsg->getTargetId()
-                <<endl;
-        // TODO
-        break;
-    case CDCMT_ConnectToGCU:
-        debugEV <<"CooperativeDownload::handleLowerMsg::CDCMT_ConnectToGCU: "
-                << cdmsg->getTargetId()
-                <<endl;
-        // TODO
-        break;
-    case CDCMT_DisconnectFromAP:
-        debugEV <<"CooperativeDownload::handleLowerMsg::CDCMT_DisconnectFromAP: "
-                << cdmsg->getTargetId()
-                <<endl;
-        // TODO
-        break;
-    case CDCMT_DisconnectFromGCU:
-        debugEV <<"CooperativeDownload::handleLowerMsg::CDCMT_DisconnectFromGCU: "
-                << cdmsg->getTargetId()
-                <<endl;
-        // TODO
-        break;
-    case CDCMT_DisconnectAll:
-        debugEV <<"CooperativeDownload::handleLowerMsg::CDCMT_DisconnectAll"
-                <<endl;
-        selfReset();
         delete msg;
-        msg = NULL;
-        break;
-    case CDCMT_UpdatePostion:
-        debugEV <<"CooperativeDownload::handleLowerMsg::CDCMT_UpdatePostion"
-                <<endl;
-        break;
-    default:
-        delete msg;
-        msg = NULL;
-        break;
+    } else {
+        switch (cdmsg->getMsgType()) {
+        case CDCMT_ConnectToAP:
+            debugEV
+                    << "CooperativeDownload::handleLowerMsg::CDCMT_ConnectToAP: "
+                    << cdmsg->getTargetId() << endl;
+            sayHelloToAp(cdmsg->getTargetId());
+            break;
+        case CDCMT_ConnectToGCU:
+            debugEV
+                    << "CooperativeDownload::handleLowerMsg::CDCMT_ConnectToGCU: "
+                    << cdmsg->getTargetId() << endl;
+            // TODO
+            break;
+        case CDCMT_DisconnectFromAP:
+            debugEV
+                    << "CooperativeDownload::handleLowerMsg::CDCMT_DisconnectFromAP: "
+                    << cdmsg->getTargetId() << endl;
+            sayByeToAp(cdmsg->getTargetId());
+            break;
+        case CDCMT_DisconnectFromGCU:
+            debugEV
+                    << "CooperativeDownload::handleLowerMsg::CDCMT_DisconnectFromGCU: "
+                    << cdmsg->getTargetId() << endl;
+            disconnectFromCar(cdmsg->getTargetId());
+            break;
+        case CDCMT_DisconnectAll:
+            debugEV
+                    << "CooperativeDownload::handleLowerMsg::CDCMT_DisconnectAll"
+                    << endl;
+            selfReset();
+            break;
+        case CDCMT_UpdatePostion:
+            debugEV
+                    << "CooperativeDownload::handleLowerMsg::CDCMT_UpdatePostion"
+                    << endl;
+            break;
+        default:
+            break;
+        }
+        delete cdmsg;
     }
+}
+
+void CooperativeDownload::sayHelloToAp(int apid) {
+    // TODO
+}
+
+void CooperativeDownload::sayByeToAp(int apid) {
+    // TODO
+}
+
+void CooperativeDownload::disconnectFromCurrentCar() {
+    if (!isTargetCar) {
+        cancelEvent(frameTimer);
+    }
+    targetID = LAddress::L3NULL;
+    car_Status = CAR_IDEL;
+}
+
+void CooperativeDownload::connectToCar(int carid) {
+    // TODO
+
+}
+
+void CooperativeDownload::disconnectFromCar(int carid) {
+    untappedCarList.remove(carid);
+    if (carid == targetID) {
+        disconnectFromCurrentCar();
+    }
+}
+
+void CooperativeDownload::finish() {
+
+    cancelAndDelete(frameTimer);
 }
 
 void CooperativeDownload::selfReset() {
+    for(CD_SQUEUE_MAP::iterator it = contentQueueMap.begin();
+            it!=contentQueueMap.end();it++){
+        it->second->clear();
+    }
     contentQueueMap.clear();
+    disconnectFromCurrentCar();
 }
 
 void CooperativeDownload::handleLowerMsg(cMessage* msg) {
+    // TODO
 }

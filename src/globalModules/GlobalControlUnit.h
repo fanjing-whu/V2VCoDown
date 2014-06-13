@@ -24,7 +24,7 @@
 #include "CoDownMsg_m.h"
 
 /**
- * TODO - Generated class
+ *
  */
 class GlobalControlUnit: public cSimpleModule, public IGlobalControlUnit {
 public:
@@ -41,6 +41,8 @@ public:
     virtual void setAddr(int addr);
     virtual Coord getCurrentPostion();
     virtual void setCurrentPostion(Coord pos);
+    virtual Coord getCurrentSpeed();
+    virtual void setCurrentSpeed(Coord speed);
     virtual void handleMsgFromNetwLayer(cMessage* msg);
     virtual void connectToGCU(IGlobalControlUnit* gcu);
     virtual void disconnectFromGCU(IGlobalControlUnit* gcu);

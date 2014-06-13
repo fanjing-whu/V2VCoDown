@@ -32,7 +32,6 @@ GlobalControlUnit::~GlobalControlUnit() {
 
 void GlobalControlUnit::initialize(int stage)
 {
-    // TODO - Generated method body
 
     EV<<"GlobalControlUnit::initialize(stage = "<< stage <<")"<<endl;
     if(stage==0){
@@ -53,7 +52,6 @@ void GlobalControlUnit::initialize(int stage)
 
 void GlobalControlUnit::handleMessage(cMessage *msg)
 {
-    // TODO - Generated method body
     if (msg->isSelfMessage()){
         handleSelfMsg(msg);
     } else if(msg->getArrivalGateId()==upperLayerIn) {
@@ -213,6 +211,15 @@ void GlobalControlUnit::sendUp(cMessage *msg) {
             "GlobalControlUnit: upperLayerOut is not connected");
     send(msg, upperLayerOut);
 }
+
+Coord GlobalControlUnit::getCurrentSpeed() {
+    return lastSpeed;
+}
+
+void GlobalControlUnit::setCurrentSpeed(Coord speed) {
+    this->lastSpeed = speed;
+}
+
 void GlobalControlUnit::sendControlUp(cMessage *msg) {
     if (gate(upperControlOut)->isPathOK())
         send(msg, upperControlOut);

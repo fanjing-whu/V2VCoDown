@@ -9,13 +9,11 @@
 #include <sstream>
 
 GlobalStatisticsUnit::GlobalStatisticsUnit(int size) {
-    // TODO Auto-generated constructor stub
     this->size = size;
     data = new double[size];
 }
 
 GlobalStatisticsUnit::~GlobalStatisticsUnit() {
-    // TODO Auto-generated destructor stub
 
     size = 0;
     delete(data);

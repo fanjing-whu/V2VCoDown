@@ -19,7 +19,7 @@
 #include <omnetpp.h>
 
 /**
- * TODO - Generated class
+ * GlobalAP does nothing at now
  */
 class GlobalAP : public cSimpleModule
 {

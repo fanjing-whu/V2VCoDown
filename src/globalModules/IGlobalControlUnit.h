@@ -23,7 +23,14 @@
 class IGlobalControlUnit {
 public:
     IGlobalControlUnit() :
-            neighbors(),m_isAp(false), m_hasAp(false), m_apid(0), lastPos(Coord::ZERO),sendPower(0),receivePower(0){
+            neighbors(),
+            m_isAp(false),
+            m_hasAp(false),
+            m_apid(0),
+            lastPos(Coord::ZERO),
+            lastSpeed(Coord::ZERO),
+            sendPower(0),
+            receivePower(0){
     }
     virtual ~IGlobalControlUnit() {
     }
@@ -36,6 +43,8 @@ public:
     virtual int getAddr() = 0;
     virtual void setCurrentPostion(Coord pos) = 0;
     virtual Coord getCurrentPostion() = 0;
+    virtual void setCurrentSpeed(Coord speed) = 0;
+    virtual Coord getCurrentSpeed() = 0;
     virtual void handleMsgFromNetwLayer(cMessage* msg) = 0;
     virtual void connectToGCU(IGlobalControlUnit* gcu) {
         neighbors[gcu->getAddr()] = gcu;
@@ -115,6 +124,7 @@ protected:
     bool m_hasAp;
     int m_apid;
     Coord lastPos;
+    Coord lastSpeed;
     double sendPower;
     double receivePower;
 };

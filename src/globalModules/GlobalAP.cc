@@ -20,10 +20,10 @@ int GlobalAP::apid = 0;
 
 void GlobalAP::initialize()
 {
-    // TODO - Generated method body
+    // GlobalAP does nothing at now
 }
 
 void GlobalAP::handleMessage(cMessage *msg)
 {
-    // TODO - Generated method body
+    // GlobalAP does nothing at now
 }

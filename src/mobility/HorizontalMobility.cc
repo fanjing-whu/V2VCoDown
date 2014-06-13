@@ -20,12 +20,18 @@
 Define_Module(HorizontalMobility);
 
 HorizontalMobility::HorizontalMobility() {
-    // TODO Auto-generated constructor stub
-
+    acceleration = 0;
+    speed = 0;
+    speedOffset = 0;
+    angle = 0;
+    maxSpeed = 0;
+    minSpeed = 0;
+    stepTarget = Coord::ZERO;
+    gcu = NULL;
 }
 
 HorizontalMobility::~HorizontalMobility() {
-    // TODO Auto-generated destructor stub
+    // do nothing now
 }
 
 void HorizontalMobility::initialize(int stage)
@@ -93,7 +99,8 @@ void HorizontalMobility::makeMove()
 
     fixIfHostGetsOutside();
 
-    gcu->setCurrentPostion(move.getStartPos());
+    gcu->setCurrentPostion(getCurrentPosition());
+    gcu->setCurrentSpeed(getCurrentSpeed());
 }
 
 

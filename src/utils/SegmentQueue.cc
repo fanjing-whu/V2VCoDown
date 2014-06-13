@@ -24,7 +24,7 @@ SegmentQueue::SegmentQueue(double start, double end) {
 }
 
 SegmentQueue::~SegmentQueue() {
-    this->clean();
+    this->clear();
 }
 
 void SegmentQueue::remove(SegmentQueue& sq) {
@@ -318,7 +318,7 @@ SegmentQueue* SegmentQueue::copy() {
     return copy;
 }
 
-void SegmentQueue::clean() {
+void SegmentQueue::clear() {
     for (SQueue::iterator it = sq.begin(); it != sq.end();) {
         removeNode(it);
     }
@@ -358,6 +358,34 @@ SegmentQueue* SegmentQueue::getFirstSegment() {
     }else{
         return new SegmentQueue();
     }
+}
+
+double SegmentQueue::getStartValue() {
+    return (*sq.begin())->value;
+}
+
+SegmentQueue* SegmentQueue::getFirstSegment(double length) {
+    SegmentQueue* first = this->getFirstSegment();
+    if(first->length()<=length){
+        return first;
+    }else{
+        SegmentQueue* subfirst = new SegmentQueue(first->getStartValue(),first->getStartValue()+length);
+        delete(first);
+        return subfirst;
+    }
+}
+
+double SegmentQueue::getFirstStart() {
+    return getStartValue();
+}
+
+double SegmentQueue::getFirstEnd() {
+    SQueue::iterator it = sq.begin();
+    it++;
+    if((*it)->flag){
+        return -1;
+    }
+    return (*it)->value;
 }
 
 void SegmentQueue::init(double start, double end) {
