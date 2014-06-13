@@ -22,8 +22,13 @@ CooperativeDownload::CooperativeDownload() {
 }
 
 CooperativeDownload::~CooperativeDownload() {
+    clearContentMap();
+    clearTimeMap();
+    cancelAndDelete(frameTimer);
 }
 
+void CooperativeDownload::finish() {
+}
 void CooperativeDownload::initialize(int stage)
 {
     BaseGlobalAppLayer::initialize(stage);
@@ -155,20 +160,33 @@ void CooperativeDownload::disconnectFromCar(int carid) {
     }
 }
 
-void CooperativeDownload::finish() {
 
-    cancelAndDelete(frameTimer);
+void CooperativeDownload::askForDownload(int apid) {
 }
 
 void CooperativeDownload::selfReset() {
-    for(CD_SQUEUE_MAP::iterator it = contentQueueMap.begin();
-            it!=contentQueueMap.end();it++){
-        it->second->clear();
-    }
-    contentQueueMap.clear();
+    clearContentMap();
+    clearTimeMap();
+    untappedCarList.clear();
     disconnectFromCurrentCar();
 }
 
 void CooperativeDownload::handleLowerMsg(cMessage* msg) {
     // TODO
+}
+
+void CooperativeDownload::clearContentMap() {
+    for(CD_SQUEUE_MAP::iterator it = contentQueueMap.begin();
+            it!=contentQueueMap.end();it++){
+        it->second->clear();
+    }
+    contentQueueMap.clear();
+}
+
+void CooperativeDownload::clearTimeMap() {
+    for(CD_SQUEUE_MAP::iterator it = timeQueueMap.begin();
+            it!=timeQueueMap.end();it++){
+        it->second->clear();
+    }
+    timeQueueMap.clear();
 }

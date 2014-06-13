@@ -44,6 +44,8 @@ private:
     void disconnectFromCar(int carid);
     void disconnectFromCurrentCar();
     void selfReset();
+    void clearContentMap();
+    void clearTimeMap();
 private:
     CD_SQUEUE_MAP contentQueueMap;
     CD_SQUEUE_MAP timeQueueMap;
