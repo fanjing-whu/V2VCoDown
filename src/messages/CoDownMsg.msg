@@ -22,28 +22,34 @@ packet ApplPkt;
 // TODO generated message class
 //
 enum CoDownMsgType{
-	CDMT_Request = 0;	// ask AP for download
-	CDMT_Hello = 1;	// hello message
-	CDMT_IsBusy = 2;	// reply for hello msg
-	CDMT_IsIdle = 3;	//
-	CDMT_Send = 4;	// send content to target
-	CDMT_APSend = 5;	// send the sensor message
-	CDMT_Reply = 6;	// replay for the sensor message
-	CDMT_Scan = 7;	// use for making back-up
-	CDMT_Negative = 8;	// 
-	CDMT_Acative = 9;	// 
-	CDMT_Quit = 10;	// leave AP range
-	CDCMT_ConnectToGCU = 11;
-	CDCMT_ConnectToAP = 12;
-	CDCMT_DisconnectFromGCU = 13;
-	CDCMT_DisconnectFromAP = 14;
-	CDCMT_DisconnectAll = 15;
-	CDCMT_UpdatePostion = 16;
+    
+    // Base message types
+	CDMT_RequestAP = 0;	//S ask AP for download
+	CDMT_Sensor = 1;	//B send the sensor message
+	CDMT_Hello = 2;		//S hello message
+	CDMT_IsBusy = 3;	//B reply for hello msg
+	CDMT_IsIdle = 4;	//B reply for hello msg
+	CDMT_Send = 5;		//S send content to target
+	CDMT_Reply = 6;		//S replay for the sensor message
+	CDMT_APSend = 7;	//S send content to co-car from AP
+	CDMT_Scan = 8;		//B use for making back-up
+	CDMT_Negative = 9;	//B reply for scan msg
+	CDMT_Acative = 10;	//B reply for scan msg
+	CDMT_Quit = 11;		//B leave AP range
+	CDMT_Request = 12;	//S request content from car
+	
+	// Control message types
+	CDCMT_ConnectToGCU = 100;
+	CDCMT_ConnectToAP = 101;
+	CDCMT_DisconnectFromGCU = 102;
+	CDCMT_DisconnectFromAP = 103;
+	CDCMT_DisconnectAll = 104;
+	CDCMT_UpdatePostion = 105;
 }
 packet CoDownBaseMsg extends ApplPkt {
     int msgType @enum(CoDownMsgType);
 }
-packet CoDownRequestMsg extends CoDownBaseMsg{
+packet CoDownRequestAPMsg extends CoDownBaseMsg{
     double speed;
     double angle;
     double startPos;
@@ -62,6 +68,10 @@ packet CoDownReplyMsg extends CoDownBaseMsg{
     double endPos;
     double position;
 } 
+packet CoDownRequestMsg extends CoDownBaseMsg{
+    double startPos;
+    double endPos;
+}
 packet CoDownAPContentMsg extends CoDownBaseMsg{
     double startTime;
     double endTime;
