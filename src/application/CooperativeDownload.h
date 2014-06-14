@@ -36,14 +36,25 @@ public:
     void handleSelfMsg(cMessage *msg);
     void handleLowerControl(cMessage *msg);
     void handleLowerMsg(cMessage *msg);
+
 private:
-    void askForDownload(int apid);
-    void sayHelloToAp(int apid);
-    void sayByeToAp(int apid);
-    void connectToCar(int carid);
-    void disconnectFromCar(int carid);
-    void disconnectFromCurrentCar();
-    void selfReset();
+    // handle control messages.
+    void connectToAP(int apid); // when connect to an AP
+    void disconnectFromAP(int apid);    // an AP disconnected
+    void connectToCar(int carid);   // when connect to a car
+    void disconnectFromCar(int carid);  // a car disconnected
+
+    // handle self messages.
+    void handleFrameTimer();
+
+    // handle lower message.
+
+    // private functional method
+    void askForDownload(int apid);  // start the task
+    void sayHelloToAp(int apid);    // start when a CO-CAR gets into AP range
+    void sayByeToAp(int apid);  // CO-CAR leave AP range
+    void disconnectFromCurrentCar();    // target car disconnect
+    void selfReset();   // when this car run out of the broad
     void clearContentMap();
     void clearTimeMap();
 private:
