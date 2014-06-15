@@ -24,19 +24,20 @@ packet ApplPkt;
 enum CoDownMsgType{
     
     // Base message types
-	CDMT_RequestAP = 0;	//S ask AP for download
-	CDMT_Sensor = 1;	//B send the sensor message
-	CDMT_Hello = 2;		//S hello message
-	CDMT_IsBusy = 3;	//B reply for hello msg
-	CDMT_IsIdle = 4;	//B reply for hello msg
-	CDMT_Send = 5;		//S send content to target
-	CDMT_Reply = 6;		//S replay for the sensor message
-	CDMT_APSend = 7;	//S send content to co-car from AP
-	CDMT_Scan = 8;		//B use for making back-up
-	CDMT_Negative = 9;	//B reply for scan msg
-	CDMT_Acative = 10;	//B reply for scan msg
-	CDMT_Quit = 11;		//B leave AP range
-	CDMT_Request = 12;	//S request content from car
+	CDMT_AskAP = 0;			//S ask AP for download
+	CDMT_Sensor = 1;		//B send the sensor message
+	CDMT_Hello = 2;			//S hello message
+	CDMT_IsBusy = 3;		//B reply for hello msg
+	CDMT_IsIdle = 4;		//B reply for hello msg
+	CDMT_Send = 5;			//S send content to target
+	CDMT_Reply = 6;			//S replay for the sensor message
+	CDMT_APSend = 7;		//S send content to co-car from AP
+	CDMT_Scan = 8;			//B use for making back-up
+	CDMT_Negative = 9;		//B reply for scan msg
+	CDMT_Acative = 10;		//B reply for scan msg
+	CDMT_Quit = 11;			//B leave AP range
+	CDMT_Request = 12;		//S request content from car
+	CDMT_RequestAP = 13;	//S request content from AP
 	
 	// Control message types
 	CDCMT_ConnectToGCU = 100;
@@ -49,7 +50,7 @@ enum CoDownMsgType{
 packet CoDownBaseMsg extends ApplPkt {
     int msgType @enum(CoDownMsgType);
 }
-packet CoDownRequestAPMsg extends CoDownBaseMsg{
+packet CoDownAskAPMsg extends CoDownBaseMsg{
     double speed;
     double angle;
     double startPos;

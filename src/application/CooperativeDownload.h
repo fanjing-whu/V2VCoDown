@@ -55,6 +55,12 @@ private:
     void sayByeToAp(int apid);  // CO-CAR leave AP range
     void disconnectFromCurrentCar();    // target car disconnect
     void selfReset();   // when this car run out of the broad
+    void startSensingProcess(); // start sensing process if target CAR
+    void sendContentToCar();    // send content to target car
+    void requestContentFromAP();    // request content from an AP
+    void sendSensorMsgToCar();  // send sensor message to a car
+    void requestContentFromCar();   //request content from a car.
+
     void clearContentMap();
     void clearTimeMap();
 private:
@@ -69,17 +75,19 @@ private:
     double taskSize;
     double frameSize;
     double frameInterval;
+    double APframeSize;
     cMessage* frameTimer;
 
     enum CarStatus{
         CAR_IDEL = 0,
         CAR_BUSY,
+        CAR_SENSING,
         CAR_PRESENDING,
         CAR_SENDING,
         CAR_RECEIVING,
         CAR_AP
     };
-    LAddress::L3Type targetID;
+    int targetID;
     CarStatus car_Status;
 };
 
