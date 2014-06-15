@@ -28,6 +28,7 @@ CooperativeDownload::~CooperativeDownload() {
 }
 
 void CooperativeDownload::finish() {
+    // TODO
 }
 void CooperativeDownload::initialize(int stage)
 {
@@ -127,7 +128,7 @@ void CooperativeDownload::disconnectFromCurrentCar() {
         cancelEvent(frameTimer);
     }else{
         if(!untappedCarList.empty()){
-
+            // TODO add the target car's actions
         }
     }
 }
@@ -146,6 +147,7 @@ void CooperativeDownload::disconnectFromCar(int carid) {
 
 
 void CooperativeDownload::askForDownload(int apid) {
+    // TODO
 }
 
 void CooperativeDownload::selfReset() {
@@ -176,6 +178,7 @@ void CooperativeDownload::connectToAP(int apid) {
 }
 
 void CooperativeDownload::disconnectFromAP(int apid) {
+    // TODO
     if(isTargetCar){
 
     }else{
@@ -208,6 +211,7 @@ void CooperativeDownload::handleFrameTimer() {
             debugEV<<"Error: Start sending process from an unknown status."<<endl;
         }
     }else{
+        // TODO add the target car's actions
 
     }
 }
