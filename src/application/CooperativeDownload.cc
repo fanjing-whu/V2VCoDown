@@ -137,7 +137,12 @@ void CooperativeDownload::disconnectFromCurrentCar() {
 
 void CooperativeDownload::connectToCar(int carid) {
     // TODO
-
+    untappedCarList.push_back(carid);
+    if (isTargetCar) {
+        startSensingProcess();
+    } else {
+        startScanProcess();
+    }
 }
 
 void CooperativeDownload::disconnectFromCar(int carid) {
@@ -250,6 +255,14 @@ void CooperativeDownload::requestContentFromAP() {
 }
 
 void CooperativeDownload::requestContentFromCar() {
+    car_Status = CAR_SCANING;
+    {
+        CoDownBaseMsg* cdmsg = new CoDownBaseMsg();
+        cdmsg->setMsgType(CDMT_Scan);
+        cdmsg->setSrcAddr(gcu->getAddr());
+        cdmsg->setDestAddr(*untappedCarList.begin());
+        sendDown(cdmsg);
+    }
 }
 
 void CooperativeDownload::sendSensorMsgToCar() {
@@ -269,6 +282,18 @@ void CooperativeDownload::startSensingProcess() {
             sendSensorMsgToCar();
         }
     }
+}
+
+void CooperativeDownload::startScanProcess() {
+    if(car_Status == CAR_IDEL){
+        if(!untappedCarList.empty()){
+            sendScanMsgToCar();
+        }
+    }
+}
+
+void CooperativeDownload::sendScanMsgToCar() {
+
 }
 
 void CooperativeDownload::clearTimeMap() {

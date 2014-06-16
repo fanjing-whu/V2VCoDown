@@ -56,9 +56,11 @@ private:
     void disconnectFromCurrentCar();    // target car disconnect
     void selfReset();   // when this car run out of the broad
     void startSensingProcess(); // start sensing process if target CAR
+    void startScanProcess(); // start scaning process if CO-CAR
     void sendContentToCar();    // send content to target car
     void requestContentFromAP();    // request content from an AP
-    void sendSensorMsgToCar();  // send sensor message to a car
+    void sendSensorMsgToCar();  // target CAR sends sensor message to a car
+    void sendScanMsgToCar();    // CO-CAR scan other car
     void requestContentFromCar();   //request content from a car.
 
     void clearContentMap();
@@ -82,6 +84,7 @@ private:
         CAR_IDEL = 0,
         CAR_BUSY,
         CAR_SENSING,
+        CAR_SCANING,
         CAR_PRESENDING,
         CAR_SENDING,
         CAR_RECEIVING,
