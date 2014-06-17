@@ -175,6 +175,37 @@ void CooperativeDownload::selfReset() {
 
 void CooperativeDownload::handleLowerMsg(cMessage* msg) {
     // TODO
+    CoDownBaseMsg* cdmsg = check_and_cast<CoDownBaseMsg*>(msg);
+    if(cdmsg == NULL){
+        delete msg;
+    }else{
+        switch(cdmsg->getMsgType()){
+        case CDMT_Sensor:
+            break;
+        case CDMT_Hello:
+            break;
+        case CDMT_IsBusy:
+            break;
+        case CDMT_IsIdle:
+            break;
+        case CDMT_Send:
+            break;
+        case CDMT_APSend:
+            break;
+        case CDMT_Scan:
+            break;
+        case CDMT_Negative:
+            break;
+        case CDMT_Acative:
+            break;
+        case CDMT_Request:
+            break;
+        default:
+            debugEV<<"Error: get an unknown message from lower layer."<<endl;
+            delete msg;
+            break;
+        }
+    }
 }
 
 void CooperativeDownload::clearContentMap() {
