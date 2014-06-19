@@ -18,7 +18,7 @@
 Define_Module(CooperativeDownload);
 
 CooperativeDownload::CooperativeDownload() {
-    // TODO
+    // TODO generate()
 }
 
 CooperativeDownload::~CooperativeDownload() {
@@ -28,7 +28,7 @@ CooperativeDownload::~CooperativeDownload() {
 }
 
 void CooperativeDownload::finish() {
-    // TODO
+    // TODO finish()
 }
 void CooperativeDownload::initialize(int stage)
 {
@@ -117,12 +117,26 @@ void CooperativeDownload::handleLowerControl(cMessage* msg) {
 }
 
 void CooperativeDownload::sayHelloToAp(int apid) {
-    // TODO
-
+    {
+        CoDownHelloMsg* cdmsg = new CoDownHelloMsg();
+        cdmsg->setMsgType(CDMT_Hello);
+        cdmsg->setSrcAddr(gcu->getAddr());
+        cdmsg->setDestAddr(gcu->apid());
+        cdmsg->setSpeed(fabs(gcu->getSpeed().x));
+        cdmsg->setAngle(gcu->getSpeed().x > 0 ? 0 : 180);
+        cdmsg->setPosition(gcu->getCurrentPostion().x);
+        gcu->sendMsgToAP(gcu->apid(), cdmsg);
+    }
 }
 
 void CooperativeDownload::sayByeToAp(int apid) {
-    // TODO
+    {
+        CoDownBaseMsg* cdmsg = new CoDownBaseMsg();
+        cdmsg->setMsgType(CDMT_Quit);
+        cdmsg->setSrcAddr(gcu->getAddr());
+        cdmsg->setDestAddr(gcu->apid());
+        gcu->sendMsgToAP(gcu->apid(), cdmsg);
+    }
 }
 
 void CooperativeDownload::disconnectFromCurrentCar() {
@@ -136,7 +150,6 @@ void CooperativeDownload::disconnectFromCurrentCar() {
 }
 
 void CooperativeDownload::connectToCar(int carid) {
-    // TODO
     untappedCarList.push_back(carid);
     if (isTargetCar) {
         startSensingProcess();
@@ -174,35 +187,66 @@ void CooperativeDownload::selfReset() {
 }
 
 void CooperativeDownload::handleLowerMsg(cMessage* msg) {
-    // TODO
+    // FIXME add handle functions
     CoDownBaseMsg* cdmsg = check_and_cast<CoDownBaseMsg*>(msg);
     if(cdmsg == NULL){
         delete msg;
     }else{
         switch(cdmsg->getMsgType()){
+        case CDMT_AskAP:
+            debugEV<<"Error: do not send ASKAP message to a car."<<endl;
+            delete cdmsg;
+            break;
         case CDMT_Sensor:
+            handleSensorMsg(cdmsg);
             break;
         case CDMT_Hello:
+            debugEV<<"Error: do not send HELLO message to a car."<<endl;
             break;
         case CDMT_IsBusy:
+            handleIsBusyMsg(cdmsg);
             break;
         case CDMT_IsIdle:
+            // not handle for now.
+            debugEV<<"Error: not handle for now."<<endl;
+            delete cdmsg;
             break;
         case CDMT_Send:
+            handleSendMsg(cdmsg);
+            break;
+        case CDMT_Reply:
+            handleReplyMsg(cdmsg);
             break;
         case CDMT_APSend:
+            handleAPSendMsg(cdmsg);
             break;
         case CDMT_Scan:
+            // use to make backup, not handle for now.
+            debugEV<<"Error: use to make backup, not handle for now."<<endl;
+            delete cdmsg;
             break;
         case CDMT_Negative:
+            handleNagativeMsg(cdmsg);
             break;
         case CDMT_Acative:
+            // use to make backup, not handle for now.
+            debugEV<<"Error: use to make backup, not handle for now."<<endl;
+            delete cdmsg;
+            break;
+        case CDMT_Quit:
+            debugEV<<"Error: do not send QUIT message to a car."<<endl;
+            delete cdmsg;
             break;
         case CDMT_Request:
+            handleRequestMsg(cdmsg);
+            break;
+        case CDMT_RequestAP:
+            debugEV<<"Error: do not send REQUESTAP message to a car."<<endl;
+            delete cdmsg;
             break;
         default:
             debugEV<<"Error: get an unknown message from lower layer."<<endl;
-            delete msg;
+            delete cdmsg;
             break;
         }
     }
@@ -226,19 +270,35 @@ void CooperativeDownload::connectToAP(int apid) {
 }
 
 void CooperativeDownload::disconnectFromAP(int apid) {
-    // TODO
     if(isTargetCar){
-        sayByeToAp(apid);
+        // sayByeToAp(apid);
     }else{
         sayByeToAp(apid);
     }
 }
 
 void CooperativeDownload::handleFrameTimer() {
+    // TODO handle the frametimer message
     if (!isTargetCar) {
-        sendContentToCar();
+        switch(car_Status){
+        case CAR_SENDING:
+            sendContentToCar();
+            break;
+        case CAR_IDEL:
+            break;
+        default:
+            break;
+        }
     }else{
-        requestContentFromAP();
+        switch(car_Status){
+        case CAR_AP:
+            requestContentFromAP();
+            break;
+        case CAR_IDEL:
+            break;
+        default:
+            break;
+        }
     }
 }
 
@@ -298,6 +358,7 @@ void CooperativeDownload::requestContentFromCar() {
 
 void CooperativeDownload::sendSensorMsgToCar() {
     car_Status = CAR_SENSING;
+    targetID = *untappedCarList.begin();
     {
         CoDownBaseMsg* cdmsg = new CoDownBaseMsg();
         cdmsg->setMsgType(CDMT_Sensor);
@@ -316,6 +377,7 @@ void CooperativeDownload::startSensingProcess() {
 }
 
 void CooperativeDownload::startScanProcess() {
+    // FIXME do not use for now
     if(car_Status == CAR_IDEL){
         if(!untappedCarList.empty()){
             sendScanMsgToCar();
@@ -324,7 +386,90 @@ void CooperativeDownload::startScanProcess() {
 }
 
 void CooperativeDownload::sendScanMsgToCar() {
+    // FIXME do nothing for now
+}
 
+void CooperativeDownload::handleSensorMsg(CoDownBaseMsg* msg) {
+    // TODO handleSensorMsg();
+    if(isTargetCar){
+        {
+            sendNagativeTo(msg->getSrcAddr());
+        }
+    }else{
+        if (car_Status == CAR_IDEL) {
+            if(contentQueueMap.find(msg->getSrcAddr())!= contentQueueMap.end()){
+                {
+                    CoDownReplyMsg* cdmsg = CoDownReplyMsg();
+                    cdmsg->setMsgType(CDMT_Reply);
+                    cdmsg->setSrcAddr(gcu->getAddr());
+                    cdmsg->setDestAddr(msg->getSrcAddr());
+                    cdmsg->setSpeed(fabs(gcu->getSpeed().x));
+                    cdmsg->setAngle(gcu->getSpeed().x > 0 ? 0 : 180);
+                    cdmsg->setPosition(gcu->getCurrentPostion().x);
+                    cdmsg->setStartPos(contentQueueMap[msg->getSrcAddr()]->getFirstStart());
+                    cdmsg->setEndPos(contentQueueMap[msg->getSrcAddr()]->getFirstEnd());
+                    sendDown(cdmsg);
+                }
+            } else {
+                sendNagativeTo(msg->getSrcAddr());
+            }
+        }else{
+            sendIsBusyTo(msg->getSrcAddr());
+        }
+    }
+    delete msg;
+}
+
+void CooperativeDownload::handleReplyMsg(CoDownBaseMsg* msg) {
+    // TODO handleReplyMsg();
+}
+
+void CooperativeDownload::handleSendMsg(CoDownBaseMsg* msg) {
+    // TODO handleSendMsg();
+}
+
+void CooperativeDownload::handleAPSendMsg(CoDownBaseMsg* msg) {
+    // TODO handleAPSendMsg();
+
+}
+
+void CooperativeDownload::handleRequestMsg(CoDownBaseMsg* msg) {
+    // TODO handleRequestMsg();
+}
+
+void CooperativeDownload::sendIsBusyTo(int carid) {
+    CoDownBaseMsg* cdmsg = new CoDownBaseMsg();
+    cdmsg->setMsgType(CDMT_IsBusy);
+    cdmsg->setSrcAddr(gcu->getAddr());
+    cdmsg->setDestAddr(carid);
+    sendDown(cdmsg);
+}
+
+void CooperativeDownload::sendNagativeTo(int carid) {
+    CoDownBaseMsg* cdmsg = new CoDownBaseMsg();
+    cdmsg->setMsgType(CDMT_Negative);
+    cdmsg->setSrcAddr(gcu->getAddr());
+    cdmsg->setDestAddr(carid);
+    sendDown(cdmsg);
+}
+
+void CooperativeDownload::handleIsBusyMsg(CoDownBaseMsg* msg) {
+    if(msg->getSrcAddr()==targetID){
+        untappedCarList.remove(targetID);
+        untappedCarList.push_back(targetID);
+        scheduleAt(simTime()+frameInterval,frameTimer);
+    }else{
+        // FIXME a msg from a wrong car.
+    }
+}
+
+void CooperativeDownload::handleNagativeMsg(CoDownBaseMsg* msg) {
+    if(msg->getSrcAddr()==targetID){
+        untappedCarList.remove(targetID);
+        scheduleAt(simTime()+frameInterval,frameTimer);
+    }else{
+        // FIXME a msg from a wrong car.
+    }
 }
 
 void CooperativeDownload::clearTimeMap() {

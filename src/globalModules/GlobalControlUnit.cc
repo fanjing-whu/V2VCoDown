@@ -220,6 +220,14 @@ void GlobalControlUnit::setCurrentSpeed(Coord speed) {
     this->lastSpeed = speed;
 }
 
+void GlobalControlUnit::setSpeed(Coord speed) {
+    this->averageSpeed = speed;
+}
+
+Coord GlobalControlUnit::getSpeed() {
+    return averageSpeed;
+}
+
 void GlobalControlUnit::sendControlUp(cMessage *msg) {
     if (gate(upperControlOut)->isPathOK())
         send(msg, upperControlOut);

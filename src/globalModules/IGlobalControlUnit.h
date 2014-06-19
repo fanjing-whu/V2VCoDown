@@ -45,6 +45,8 @@ public:
     virtual Coord getCurrentPostion() = 0;
     virtual void setCurrentSpeed(Coord speed) = 0;
     virtual Coord getCurrentSpeed() = 0;
+    virtual void setSpeed(Coord speed) = 0;
+    virtual Coord getSpeed() = 0;
     virtual void handleMsgFromNetwLayer(cMessage* msg) = 0;
     virtual void connectToGCU(IGlobalControlUnit* gcu) {
         neighbors[gcu->getAddr()] = gcu;
@@ -125,6 +127,7 @@ protected:
     int m_apid;
     Coord lastPos;
     Coord lastSpeed;
+    Coord averageSpeed;
     double sendPower;
     double receivePower;
 };

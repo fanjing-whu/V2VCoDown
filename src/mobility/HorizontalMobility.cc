@@ -44,6 +44,13 @@ void HorizontalMobility::initialize(int stage)
         gcu = getGCU();
         angle = par("angle").doubleValue();
         speed = par("speed").doubleValue();
+        ASSERT2(angle == 180||angle == 0,"angle must be 0 or 180. Check the INI file.");
+        Coord averageSpeed;
+        averageSpeed.x = speed * cos(PI * angle / 180);
+        averageSpeed.y = speed * sin(PI * angle / 180);
+        averageSpeed.z = 0;
+
+        gcu->setSpeed(averageSpeed);
         speedOffset = par("speedOffset").doubleValue();
         ASSERT2(speed>speedOffset,"speed must bigger than speedOffset. Check the INI file.");
         maxSpeed = speed+speedOffset;

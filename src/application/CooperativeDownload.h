@@ -48,6 +48,13 @@ private:
     void handleFrameTimer();
 
     // handle lower message.
+    void handleSensorMsg(CoDownBaseMsg* msg);
+    void handleReplyMsg(CoDownBaseMsg* msg);
+    void handleSendMsg(CoDownBaseMsg* msg);
+    void handleAPSendMsg(CoDownBaseMsg* msg);
+    void handleRequestMsg(CoDownBaseMsg* msg);
+    void handleIsBusyMsg(CoDownBaseMsg* msg);
+    void handleNagativeMsg(CoDownBaseMsg* msg);
 
     // private functional method
     void askForDownload(int apid);  // start the task
@@ -62,6 +69,8 @@ private:
     void sendSensorMsgToCar();  // target CAR sends sensor message to a car
     void sendScanMsgToCar();    // CO-CAR scan other car
     void requestContentFromCar();   //request content from a car.
+    void sendIsBusyTo(int carid);
+    void sendNagativeTo(int carid);
 
     void clearContentMap();
     void clearTimeMap();

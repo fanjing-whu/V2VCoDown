@@ -43,6 +43,8 @@ public:
     virtual void setCurrentPostion(Coord pos);
     virtual Coord getCurrentSpeed();
     virtual void setCurrentSpeed(Coord speed);
+    virtual void setSpeed(Coord speed);
+    virtual Coord getSpeed();
     virtual void handleMsgFromNetwLayer(cMessage* msg);
     virtual void connectToGCU(IGlobalControlUnit* gcu);
     virtual void disconnectFromGCU(IGlobalControlUnit* gcu);
