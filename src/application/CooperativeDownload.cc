@@ -398,6 +398,7 @@ void CooperativeDownload::handleSensorMsg(CoDownBaseMsg* msg) {
     }else{
         if (car_Status == CAR_IDEL) {
             if(contentQueueMap.find(msg->getSrcAddr())!= contentQueueMap.end()){
+                car_Status = CAR_PRESENDING;
                 {
                     CoDownReplyMsg* cdmsg = CoDownReplyMsg();
                     cdmsg->setMsgType(CDMT_Reply);
@@ -426,11 +427,20 @@ void CooperativeDownload::handleReplyMsg(CoDownBaseMsg* msg) {
 
 void CooperativeDownload::handleSendMsg(CoDownBaseMsg* msg) {
     // TODO handleSendMsg();
+    CoDownContentMsg* cdmsg = check_and_cast<CoDownContentMsg>(msg);
+    SegmentQueue* content = new SegmentQueue(cdmsg->getStartPos(),cdmsg->getEndPos());
+    contentQueueMap[gcu->getAddr()]->add(content);
+    if(cdmsg->getLastMsg()){
+        car_Status = CAR_IDEL;
+        untappedCarList.remove(cdmsg->getSrcAddr());
+        startSensingProcess();
+    }
+    delete content;
+    delete cdmsg;
 }
 
 void CooperativeDownload::handleAPSendMsg(CoDownBaseMsg* msg) {
     // TODO handleAPSendMsg();
-
 }
 
 void CooperativeDownload::handleRequestMsg(CoDownBaseMsg* msg) {
