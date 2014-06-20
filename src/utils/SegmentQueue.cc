@@ -361,6 +361,9 @@ SegmentQueue* SegmentQueue::getFirstSegment() {
 }
 
 double SegmentQueue::getStartValue() {
+    if(sq.begin() == sq.end()){
+        return -1;
+    }
     return (*sq.begin())->value;
 }
 
@@ -381,11 +384,20 @@ double SegmentQueue::getFirstStart() {
 
 double SegmentQueue::getFirstEnd() {
     SQueue::iterator it = sq.begin();
+    if(it == sq.end()){
+        return -1;
+    }
     it++;
     if((*it)->flag){
         return -1;
     }
     return (*it)->value;
+}
+
+bool SegmentQueue::isCollide(SegmentQueue& sq) {
+    SegmentQueue* copy = sq.copy();
+    copy->remove(*this);
+    return !copy->empty();
 }
 
 void SegmentQueue::init(double start, double end) {

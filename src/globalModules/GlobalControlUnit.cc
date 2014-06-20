@@ -121,7 +121,7 @@ void GlobalControlUnit::handleUpperControl(cMessage* msg) {
 int GlobalControlUnit::getAddr() {
     Enter_Method_Silent();
     if(isAp()){
-        return apid();
+        return getApid();
     }else{
         return myAddress;
     }

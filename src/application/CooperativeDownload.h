@@ -67,6 +67,7 @@ private:
     void sendContentToCar();    // send content to target car
     void requestContentFromAP();    // request content from an AP
     void sendSensorMsgToCar();  // target CAR sends sensor message to a car
+    void sendReplyMsgToCar();   // send reply message after recived the sensor message.
     void sendScanMsgToCar();    // CO-CAR scan other car
     void requestContentFromCar();   //request content from a car.
     void sendIsBusyTo(int carid);

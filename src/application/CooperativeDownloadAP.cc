@@ -29,7 +29,7 @@ void CooperativeDownloadAP::initialize(int stage)
     if(stage == 0){
         gcu->setAddr(getParentModule()->getId());
         gcu->isAp(true);
-        gcu->apid(getParentModule()->getIndex());
+        gcu->setApid(getParentModule()->getIndex());
     }else if(stage == 1){
     }
 }

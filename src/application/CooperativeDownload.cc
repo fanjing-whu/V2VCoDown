@@ -19,6 +19,18 @@ Define_Module(CooperativeDownload);
 
 CooperativeDownload::CooperativeDownload() {
     // TODO generate()
+    coreDebug = false;
+    debug = false;
+    isTargetCar = false;
+    taskSize = 0;
+    frameSize = 0;
+    frameInterval = 0;
+    APframeSize = 0;
+    frameTimer = 0;
+    frameTimer = NULL;
+    targetID = -1;
+    car_Status = CAR_IDEL;
+
 }
 
 CooperativeDownload::~CooperativeDownload() {
@@ -37,7 +49,7 @@ void CooperativeDownload::initialize(int stage)
         // initialize the gcu module
         gcu->setAddr(getParentModule()->getId());
         gcu->isAp(false);
-        gcu->apid(-1);
+        gcu->setApid(-1);
         // initialize other parameters
         coreDebug = par("coreDebug").boolValue();
         debug = par("debug").boolValue();
@@ -59,7 +71,6 @@ void CooperativeDownload::initialize(int stage)
 void CooperativeDownload::handleSelfMsg(cMessage* msg) {
     if(msg == frameTimer){
         handleFrameTimer();
-        delete msg;
     }else{
         debugEV<<"Error: Unknown self message."<<endl;
         delete msg;
@@ -121,11 +132,11 @@ void CooperativeDownload::sayHelloToAp(int apid) {
         CoDownHelloMsg* cdmsg = new CoDownHelloMsg();
         cdmsg->setMsgType(CDMT_Hello);
         cdmsg->setSrcAddr(gcu->getAddr());
-        cdmsg->setDestAddr(gcu->apid());
+        cdmsg->setDestAddr(gcu->getApid());
         cdmsg->setSpeed(fabs(gcu->getSpeed().x));
         cdmsg->setAngle(gcu->getSpeed().x > 0 ? 0 : 180);
         cdmsg->setPosition(gcu->getCurrentPostion().x);
-        gcu->sendMsgToAP(gcu->apid(), cdmsg);
+        gcu->sendMsgToAP(gcu->getApid(), cdmsg);
     }
 }
 
@@ -134,18 +145,21 @@ void CooperativeDownload::sayByeToAp(int apid) {
         CoDownBaseMsg* cdmsg = new CoDownBaseMsg();
         cdmsg->setMsgType(CDMT_Quit);
         cdmsg->setSrcAddr(gcu->getAddr());
-        cdmsg->setDestAddr(gcu->apid());
-        gcu->sendMsgToAP(gcu->apid(), cdmsg);
+        cdmsg->setDestAddr(gcu->getApid());
+        gcu->sendMsgToAP(gcu->getApid(), cdmsg);
     }
 }
 
 void CooperativeDownload::disconnectFromCurrentCar() {
     targetID = -1;
-    car_Status = CAR_IDEL;
-    if (!isTargetCar) {
-        cancelEvent(frameTimer);
-    }else{
-        startSensingProcess();
+    if(car_Status != CAR_AP){
+        car_Status = CAR_IDEL;
+        if (!isTargetCar) {
+            cancelEvent(frameTimer);
+        }else{
+            cancelEvent(frameTimer);
+            startSensingProcess();
+        }
     }
 }
 
@@ -172,10 +186,10 @@ void CooperativeDownload::askForDownload(int apid) {
         CoDownAskAPMsg* cdmsg = new CoDownAskAPMsg();
         cdmsg->setMsgType(CDMT_AskAP);
         cdmsg->setSrcAddr(gcu->getAddr());
-        cdmsg->setDestAddr(gcu->apid());
+        cdmsg->setDestAddr(gcu->getApid());
         cdmsg->setStartPos(contentQueueMap[gcu->getAddr()]->getFirstStart());
         cdmsg->setEndPos(contentQueueMap[gcu->getAddr()]->getFirstEnd());
-        gcu->sendMsgToAP(gcu->apid(),cdmsg);
+        gcu->sendMsgToAP(gcu->getApid(),cdmsg);
     }
 }
 
@@ -183,6 +197,7 @@ void CooperativeDownload::selfReset() {
     clearContentMap();
     clearTimeMap();
     untappedCarList.clear();
+    car_Status = CAR_IDEL;
     disconnectFromCurrentCar();
 }
 
@@ -271,20 +286,21 @@ void CooperativeDownload::connectToAP(int apid) {
 
 void CooperativeDownload::disconnectFromAP(int apid) {
     if(isTargetCar){
-        // sayByeToAp(apid);
+        // sayByeToAp(setApid);
     }else{
         sayByeToAp(apid);
     }
 }
 
 void CooperativeDownload::handleFrameTimer() {
-    // TODO handle the frametimer message
+    // FIXME handle the frametimer message
     if (!isTargetCar) {
         switch(car_Status){
         case CAR_SENDING:
             sendContentToCar();
             break;
         case CAR_IDEL:
+            startScanProcess();
             break;
         default:
             break;
@@ -295,7 +311,10 @@ void CooperativeDownload::handleFrameTimer() {
             requestContentFromAP();
             break;
         case CAR_IDEL:
+            startSensingProcess();
             break;
+        case CAR_SENDING:
+            requestContentFromCar();
         default:
             break;
         }
@@ -303,9 +322,8 @@ void CooperativeDownload::handleFrameTimer() {
 }
 
 void CooperativeDownload::sendContentToCar() {
-    if (car_Status == CAR_SENDING||car_Status == CAR_PRESENDING) {
+    if (car_Status == CAR_SENDING) {
         // start sending data to target car
-        car_Status = CAR_SENDING;
         SegmentQueue* content = contentQueueMap[targetID]->getFirstSegment(frameSize);
         contentQueueMap[targetID]->remove(*content);
         {
@@ -316,11 +334,11 @@ void CooperativeDownload::sendContentToCar() {
             cdmsg->setStartPos(content->getFirstStart());
             cdmsg->setEndPos(content->getFirstEnd());
             cdmsg->setLastMsg(contentQueueMap[targetID]->empty());
-            sendDown(cdmsg);
+            sendDelayedDown(cdmsg,frameInterval);
         }
         delete content;
-        if(!contentQueueMap[targetID]->empty()){
-            scheduleAt(simTime()+frameInterval,frameTimer);
+        if(contentQueueMap[targetID]->empty()){
+            disconnectFromCurrentCar();
         }
     }else{
         debugEV<<"Error: Start sending process from an unknown status."<<endl;
@@ -337,7 +355,7 @@ void CooperativeDownload::requestContentFromAP() {
             cdmsg->setSrcAddr(gcu->getAddr());
             cdmsg->setStartPos(content->getFirstStart());
             cdmsg->setEndPos(content->getFirstEnd());
-            gcu->sendMsgToAP(gcu->apid(),cdmsg);
+            gcu->sendMsgToAP(gcu->getApid(),cdmsg);
         }
         delete content;
     }else{
@@ -349,21 +367,24 @@ void CooperativeDownload::requestContentFromCar() {
     car_Status = CAR_SCANING;
     {
         CoDownBaseMsg* cdmsg = new CoDownBaseMsg();
-        cdmsg->setMsgType(CDMT_Scan);
+        cdmsg->setMsgType(CDMT_Request);
         cdmsg->setSrcAddr(gcu->getAddr());
-        cdmsg->setDestAddr(*untappedCarList.begin());
+        cdmsg->setDestAddr(targetID);
         sendDown(cdmsg);
     }
 }
 
 void CooperativeDownload::sendSensorMsgToCar() {
-    car_Status = CAR_SENSING;
+    if(car_Status == CAR_AP||untappedCarList.empty()){
+        return;
+    }
+    car_Status = CAR_PRESENDING;
     targetID = *untappedCarList.begin();
     {
         CoDownBaseMsg* cdmsg = new CoDownBaseMsg();
         cdmsg->setMsgType(CDMT_Sensor);
         cdmsg->setSrcAddr(gcu->getAddr());
-        cdmsg->setDestAddr(*untappedCarList.begin());
+        cdmsg->setDestAddr(targetID);
         sendDown(cdmsg);
     }
 }
@@ -390,30 +411,12 @@ void CooperativeDownload::sendScanMsgToCar() {
 }
 
 void CooperativeDownload::handleSensorMsg(CoDownBaseMsg* msg) {
-    // TODO handleSensorMsg();
     if(isTargetCar){
-        {
-            sendNagativeTo(msg->getSrcAddr());
-        }
+        sendNagativeTo(msg->getSrcAddr());
     }else{
         if (car_Status == CAR_IDEL) {
-            if(contentQueueMap.find(msg->getSrcAddr())!= contentQueueMap.end()){
-                car_Status = CAR_PRESENDING;
-                {
-                    CoDownReplyMsg* cdmsg = CoDownReplyMsg();
-                    cdmsg->setMsgType(CDMT_Reply);
-                    cdmsg->setSrcAddr(gcu->getAddr());
-                    cdmsg->setDestAddr(msg->getSrcAddr());
-                    cdmsg->setSpeed(fabs(gcu->getSpeed().x));
-                    cdmsg->setAngle(gcu->getSpeed().x > 0 ? 0 : 180);
-                    cdmsg->setPosition(gcu->getCurrentPostion().x);
-                    cdmsg->setStartPos(contentQueueMap[msg->getSrcAddr()]->getFirstStart());
-                    cdmsg->setEndPos(contentQueueMap[msg->getSrcAddr()]->getFirstEnd());
-                    sendDown(cdmsg);
-                }
-            } else {
-                sendNagativeTo(msg->getSrcAddr());
-            }
+            targetID = msg->getSrcAddr();
+            sendReplyMsgToCar();
         }else{
             sendIsBusyTo(msg->getSrcAddr());
         }
@@ -422,29 +425,103 @@ void CooperativeDownload::handleSensorMsg(CoDownBaseMsg* msg) {
 }
 
 void CooperativeDownload::handleReplyMsg(CoDownBaseMsg* msg) {
-    // TODO handleReplyMsg();
+    CoDownReplyMsg* cdmsg = check_and_cast<CoDownReplyMsg*>(msg);
+    if(cdmsg == NULL){
+        debugEV<<"Error: wrong message type!"<<endl;
+        delete msg;
+        return;
+    }
+    if(cdmsg->getSrcAddr() == targetID&& car_Status == CAR_PRESENDING){
+        // decide to download data or not
+        // caculate the contact time
+        double time = (gcu->getCurrentSpeed().x
+                - (cdmsg->getSpeed() * cos(PI * cdmsg->getAngle() / 180)))
+                / (cdmsg->getPosition() - gcu->getCurrentPostion().x
+                        + 2 * gcu->getSendPower());
+        if(time >= 1.0){
+            SegmentQueue* content = new SegmentQueue(cdmsg->getStartPos(),cdmsg->getEndPos());
+            if(contentQueueMap[gcu->getAddr()]->isCollide(*content)){
+                car_Status = CAR_SENDING;
+                scheduleAt(simTime()+1.0-frameInterval,frameTimer);
+            }else{
+                sendNagativeTo(targetID);
+                car_Status = CAR_IDEL;
+                scheduleAt(simTime()+frameInterval,frameTimer);
+            }
+            delete content;
+        }else{
+            sendNagativeTo(targetID);
+        }
+    }
+    delete cdmsg;
 }
 
 void CooperativeDownload::handleSendMsg(CoDownBaseMsg* msg) {
-    // TODO handleSendMsg();
-    CoDownContentMsg* cdmsg = check_and_cast<CoDownContentMsg>(msg);
+    CoDownContentMsg* cdmsg = check_and_cast<CoDownContentMsg*>(msg);
+    if(cdmsg == NULL){
+        debugEV<<"Error: wrong message type!"<<endl;
+        delete msg;
+        return;
+    }
     SegmentQueue* content = new SegmentQueue(cdmsg->getStartPos(),cdmsg->getEndPos());
-    contentQueueMap[gcu->getAddr()]->add(content);
+    contentQueueMap[gcu->getAddr()]->add(*content);
     if(cdmsg->getLastMsg()){
-        car_Status = CAR_IDEL;
-        untappedCarList.remove(cdmsg->getSrcAddr());
-        startSensingProcess();
+        if (car_Status != CAR_AP) {
+            car_Status = CAR_IDEL;
+            untappedCarList.remove(cdmsg->getSrcAddr());
+            startSensingProcess();
+        }else{
+            // FIXME add the process in ap-range
+        }
+    }else{
+        if(car_Status == CAR_AP){
+            requestContentFromAP();
+        }else if(car_Status == CAR_SENDING){
+            requestContentFromCar();
+        }
     }
     delete content;
     delete cdmsg;
 }
 
 void CooperativeDownload::handleAPSendMsg(CoDownBaseMsg* msg) {
-    // TODO handleAPSendMsg();
+    CoDownAPContentMsg* cdmsg = check_and_cast<CoDownAPContentMsg*>(msg);
+    if(cdmsg==NULL){
+        delete msg;
+        return;
+    }
+    if(isTargetCar){
+        // do nothing
+    }else{
+        if(contentQueueMap.find(cdmsg->getTargetId()) != contentQueueMap.end()){
+            contentQueueMap[cdmsg->getTargetId()]
+                            = new SegmentQueue(cdmsg->getStartPos(),cdmsg->getEndPos());
+            timeQueueMap[cdmsg->getTargetId()]
+                         = new SegmentQueue(cdmsg->getStartTime(),cdmsg->getEndTime());
+        }
+    }
+    delete cdmsg;
 }
 
 void CooperativeDownload::handleRequestMsg(CoDownBaseMsg* msg) {
-    // TODO handleRequestMsg();
+    CoDownRequestMsg* cdmsg = check_and_cast<CoDownRequestMsg*>(msg);
+    if(cdmsg == NULL){
+        delete msg;
+        return;
+    }
+    if(!isTargetCar){
+        if(targetID == cdmsg->getSrcAddr()){
+            car_Status = CAR_SENDING;
+            sendContentToCar();
+        }else{
+            // get request from a wrong car.
+            debugEV<<"Error: get request from a wrong car"<<endl;
+        }
+    }else{
+        // target Car does not handle request message.
+        debugEV<<"Error: target Car does not handle request message."<<endl;
+    }
+    delete cdmsg;
 }
 
 void CooperativeDownload::sendIsBusyTo(int carid) {
@@ -465,20 +542,50 @@ void CooperativeDownload::sendNagativeTo(int carid) {
 
 void CooperativeDownload::handleIsBusyMsg(CoDownBaseMsg* msg) {
     if(msg->getSrcAddr()==targetID){
-        untappedCarList.remove(targetID);
-        untappedCarList.push_back(targetID);
-        scheduleAt(simTime()+frameInterval,frameTimer);
+        if(car_Status != CAR_AP){
+            car_Status = CAR_IDEL;
+            untappedCarList.remove(targetID);
+            untappedCarList.push_back(targetID);
+            scheduleAt(simTime()+frameInterval,frameTimer);
+        }
     }else{
         // FIXME a msg from a wrong car.
+        debugEV<<"Error: a msg from a wrong car."<<endl;
     }
+    delete msg;
 }
 
 void CooperativeDownload::handleNagativeMsg(CoDownBaseMsg* msg) {
     if(msg->getSrcAddr()==targetID){
-        untappedCarList.remove(targetID);
-        scheduleAt(simTime()+frameInterval,frameTimer);
+        if(car_Status != CAR_AP){
+            car_Status = CAR_IDEL;
+            untappedCarList.remove(targetID);
+            scheduleAt(simTime()+frameInterval,frameTimer);
+        }
     }else{
         // FIXME a msg from a wrong car.
+        debugEV<<"Error: a msg from a wrong car."<<endl;
+    }
+    delete msg;
+}
+
+void CooperativeDownload::sendReplyMsgToCar() {
+    if(contentQueueMap.find(targetID)!= contentQueueMap.end()){
+        car_Status = CAR_PRESENDING;
+        {
+            CoDownReplyMsg* cdmsg = CoDownReplyMsg();
+            cdmsg->setMsgType(CDMT_Reply);
+            cdmsg->setSrcAddr(gcu->getAddr());
+            cdmsg->setDestAddr(targetID);
+            cdmsg->setSpeed(fabs(gcu->getSpeed().x));
+            cdmsg->setAngle(gcu->getSpeed().x > 0 ? 0 : 180);
+            cdmsg->setPosition(gcu->getCurrentPostion().x);
+            cdmsg->setStartPos(contentQueueMap[targetID]->getFirstStart());
+            cdmsg->setEndPos(contentQueueMap[targetID]->getFirstEnd());
+            sendDown(cdmsg);
+        }
+    } else {
+        sendNagativeTo(targetID);
     }
 }
 

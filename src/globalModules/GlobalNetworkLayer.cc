@@ -97,13 +97,13 @@ void GlobalNetworkLayer::refreshGCU(IGlobalControlUnit* gcu) {
         for (it = apMap.begin();; it++) {
             if( it==apMap.end()) {
                 if(gcu->hasAp()){
-                    gcu->disconnectFromAP(gcu->apid());
+                    gcu->disconnectFromAP(gcu->getApid());
                 }
                 break;
             }else if(gcu->isInRange(it->second)){
-                ASSERT2(!gcu->hasAp()||gcu->apid()==it->second->apid(), "Error: this GCU already has an other AP connected.");
+                ASSERT2(!gcu->hasAp()||gcu->getApid()==it->second->getApid(), "Error: this GCU already has an other AP connected.");
                 if (!gcu->hasAp()) {
-                    gcu->connectToAP(it->second->apid());
+                    gcu->connectToAP(it->second->getApid());
                 }
                 break;
             }

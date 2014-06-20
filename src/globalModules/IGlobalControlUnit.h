@@ -90,10 +90,10 @@ public:
     bool hasAp(){
         return m_hasAp;
     }
-    int apid(){
+    int getApid(){
         return m_hasAp?m_apid:-1;
     }
-    void apid(int apid){
+    void setApid(int apid){
         this->m_apid = apid;
     }
     GCU_IGCU_MAP* getNeighbors() {

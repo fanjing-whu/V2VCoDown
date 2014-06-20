@@ -38,6 +38,7 @@ public:
     double getStartValue();
     double getFirstStart();
     double getFirstEnd();
+    bool isCollide(SegmentQueue& sq);
     bool empty();
     double length();
     void clear();
