@@ -87,7 +87,11 @@ public:
     }
     virtual int getApid(){
         Enter_Method_Silent();
-        return m_hasAp?m_apid:-1;
+        if(!m_isAp){
+            return m_hasAp?m_apid:-1;
+        }else{
+            return m_apid;
+        }
     }
     virtual void setApid(int apid){
         Enter_Method_Silent();

@@ -96,7 +96,9 @@ void GlobalControlUnit::setCurrentPostion(Coord pos) {
         msg->setTargetId(getAddr());
         sendControlUp(msg);
     }
-    gnl->refreshGCU(this);
+    if (!isAp()) {
+        gnl->refreshGCU(this);
+    }
 }
 
 void GlobalControlUnit::sendMsgToAP(int apid, cMessage* msg) {
@@ -167,8 +169,9 @@ void GlobalControlUnit::disconnectFromGCU(IGlobalControlUnit* gcu) {
 
 void GlobalControlUnit::disconnectAll() {
     Enter_Method_Silent();
-    for (GCU_IGCU_MAP::iterator it = neighbors.begin();it != neighbors.end(); it++) {
+    for (GCU_IGCU_MAP::iterator it = neighbors.begin();it!= neighbors.end(); ) {
         this->disconnectFromGCU(it->second);
+        it = neighbors.begin();
     }
     {
         m_hasAp = false;

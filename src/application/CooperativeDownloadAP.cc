@@ -42,6 +42,8 @@ void CooperativeDownloadAP::initialize(int stage)
         gcu->setAddr(getParentModule()->getId());
         gcu->isAp(true);
         gcu->setApid(getParentModule()->getIndex());
+        Coord pos = Coord(par("x").doubleValue(),par("y").doubleValue(),par("z").doubleValue());
+        gcu->setCurrentPostion(pos);
 
         frameInterval = par("frameInterval").doubleValue();
         APframeSize = par("APframeSize").doubleValue();
@@ -158,7 +160,13 @@ void CooperativeDownloadAP::handleHelloMsg(cMessage* msg) {
     car.speed = cdmsg->getSpeed();
     car.time = simTime().dbl();
     carInfoList[cdmsg->getSrcAddr()] = car;
+    debugEV << " car[" << cdmsg->getSrcAddr() << "] is connected to ap["
+                   << gcu->getApid() << "];" << endl;
+    debugEV << " carInfo[id:" << cdmsg->getSrcAddr() << ",speed:"
+                   << carInfoList[cdmsg->getSrcAddr()].speed << ",position:"
+                   << carInfoList[cdmsg->getSrcAddr()].postion << "]" << endl;
     untappedCarList.push_back(cdmsg->getSrcAddr());
+    choseAssistedCAr();
 }
 
 void CooperativeDownloadAP::handleQuitMsg(cMessage* msg) {
@@ -224,7 +232,7 @@ void CooperativeDownloadAP::handleAskAPMsgFromCar(CoDownAskAPMsg* msg) {
     targetCarList[carid] = TS_INRANGE;
     // 2nd. allocate the task to next ap
     SegmentQueue* contentTotal = new SegmentQueue(startPos,endPos);
-
+    debugEV<<"maxDLSizePerAP"<<maxDLSizePerAP<<endl;
     if(taskSize>maxDLSizePerAP){
         SegmentQueue* content = contentTotal->getFirstSegment(maxDLSizePerAP);
         contentTotal->remove(*content);
@@ -288,20 +296,20 @@ void CooperativeDownloadAP::handleAskAPMsgFromAP(CoDownAskAPMsg* msg) {
     if(apnum == -1){
         activatedTargetList.insert(carid);
         targetCarList[carid] = TS_PREAP0;
-        DATime0 = (maxAPRadius*2 + maxDALength/2)/speed;
-        DATime1 = (maxAPRadius*2 + maxDALength)/speed;
+        DATime0 = simTime().dbl()+(maxAPRadius*2 + maxDALength/2)/speed;
+        DATime1 = simTime().dbl()+(maxAPRadius*2 + maxDALength)/speed;
     }else if(apnum == -2){
         activatedTargetList.insert(carid);
         targetCarList[carid] = TS_PREAP1;
-        DATime0 = (maxAPRadius*4 + maxDALength)/speed;
-        DATime1 = (maxAPRadius*4 + 3*maxDALength/2)/speed;
+        DATime0 = simTime().dbl()+(maxAPRadius*4 + maxDALength)/speed;
+        DATime1 = simTime().dbl()+(maxAPRadius*4 + 3*maxDALength/2)/speed;
     }else{
         targetCarList[carid] = TS_OUTRANGE;
     }
     // 2nd. allocate the task to next ap
     SegmentQueue* contentTotal = new SegmentQueue(startPos,endPos);
     double mineTaskSize = apnum == -1?maxDLSizePerAP+maxDLSizePerDA/2:maxDLSizePerAP+maxDLSizePerDA;
-
+    debugEV<<"mineTaskSize"<<mineTaskSize<<endl;
     if(taskSize>mineTaskSize){
         SegmentQueue* content = contentTotal->getFirstSegment(mineTaskSize);
         contentTotal->remove(*content);
@@ -383,8 +391,8 @@ void CooperativeDownloadAP::handleRequestAPFromAP(CoDownRequestAPMsg* msg) {
     // 1st. update the carlist.
     if (apnum == -1) {
         targetCarList[carid] = TS_PREAP0;
-        DATime0 = (maxAPRadius*2 + maxDALength/2)/speed;
-        DATime1 = (maxAPRadius*2 + maxDALength)/speed;
+        DATime0 = simTime().dbl()+(maxAPRadius*2 + maxDALength/2)/speed;
+        DATime1 = simTime().dbl()+(maxAPRadius*2 + maxDALength)/speed;
         if(activatedTargetList.find(carid)==activatedTargetList.end()){
             debugEV<<"Error: the car must be activated before here."<<endl;
         }
@@ -403,8 +411,8 @@ void CooperativeDownloadAP::handleRequestAPFromAP(CoDownRequestAPMsg* msg) {
         }
     }else if(apnum == -2){
         targetCarList[carid] = TS_PREAP1;
-        DATime0 = (maxAPRadius*4 + maxDALength)/speed;
-        DATime1 = (maxAPRadius*4 + 3*maxDALength/2)/speed;
+        DATime0 = simTime().dbl()+(maxAPRadius*4 + maxDALength)/speed;
+        DATime1 = simTime().dbl()+(maxAPRadius*4 + 3*maxDALength/2)/speed;
         activatedTargetList.insert(carid);
     }
     // 2nd. do nothing

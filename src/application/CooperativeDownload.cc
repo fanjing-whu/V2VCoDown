@@ -29,7 +29,7 @@ CooperativeDownload::CooperativeDownload() {
     frameTimer = NULL;
     targetID = -1;
     car_Status = CAR_INIT;
-
+    unfinishedTask = 0;
 }
 
 CooperativeDownload::~CooperativeDownload() {
@@ -37,7 +37,7 @@ CooperativeDownload::~CooperativeDownload() {
 
 void CooperativeDownload::finish() {
     if (isTargetCar) {
-        recordScalar("test", contentQueueMap[gcu->getAddr()]->length(), "0");
+        recordScalar("test", unfinishedTask);
     }
     clearContentMap();
     clearTimeMap();
@@ -63,7 +63,9 @@ void CooperativeDownload::initialize(int stage)
 
         car_Status = CAR_INIT;
         if(isTargetCar){
+            unfinishedTask = 0;
             contentQueueMap[gcu->getAddr()] = new SegmentQueue(0,taskSize);
+            WATCH(unfinishedTask);
         }
     }else if(stage == 1){
 
@@ -486,7 +488,8 @@ void CooperativeDownload::handleSendMsg(CoDownBaseMsg* msg) {
         return;
     }
     SegmentQueue* content = new SegmentQueue(cdmsg->getStartPos(),cdmsg->getEndPos());
-    contentQueueMap[gcu->getAddr()]->add(*content);
+    contentQueueMap[gcu->getAddr()]->remove(*content);
+    debugEV<<"contentQueueMap->Length():"<<contentQueueMap[gcu->getAddr()]->length()<<endl;
     if(cdmsg->getLastMsg()){
         if (car_Status != CAR_AP) {
             changeToIdel();
@@ -634,6 +637,7 @@ void CooperativeDownload::changeToIdel() {
 
 void CooperativeDownload::makeRecord() {
     if (isTargetCar) {
+        unfinishedTask = contentQueueMap[gcu->getAddr()]->length();
         if(gcu->getCurrentPostion().x>19900.0){
             endSimulation();
         }

@@ -105,6 +105,8 @@ private:
     };
     int targetID;
     CarStatus car_Status;
+
+    double unfinishedTask;
 };
 
 #endif

@@ -28,9 +28,6 @@ import simpleveins.globalModules.GlobalControlUnit;
 module AP
 {
     parameters:
-        double x; 
-        double y; 
-        double z; 
         
     gates:
         input radioIn; // gate for sendDirect

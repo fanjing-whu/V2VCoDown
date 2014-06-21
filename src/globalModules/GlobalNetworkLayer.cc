@@ -106,7 +106,7 @@ void GlobalNetworkLayer::refreshGCU(IGlobalControlUnit* gcu) {
             }else if(gcu->isInRange(it->second)){
                 ASSERT2(!gcu->hasAp()||gcu->getApid()==it->second->getApid(), "Error: this GCU already has an other AP connected.");
                 if (!gcu->hasAp()) {
-                    gcu->connectToAP(it->second->getApid());
+                    gcu->connectToAP(it->second->getAddr());
                 }
                 break;
             }
