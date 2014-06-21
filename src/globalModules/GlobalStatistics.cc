@@ -21,16 +21,16 @@ Define_Module(GlobalStatistics);
 
 void GlobalStatistics::initialize()
 {
-    // TODO - Generated method body
+    // do nothing
 }
 
 void GlobalStatistics::handleMessage(cMessage *msg)
 {
-    // TODO - Generated method body
+    // do nothing
 }
 
 GlobalStatistics::GlobalStatistics() {
-    // TODO Auto-generated constructor stub
+    // do nothing
 }
 
 GlobalStatistics::~GlobalStatistics() {

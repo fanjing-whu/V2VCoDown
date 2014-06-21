@@ -119,7 +119,11 @@ void GlobalNetworkLayer::sendMsg(cMessage* msg) {
 
 void GlobalNetworkLayer::sendMsgToAP(int apid, cMessage* msg) {
     Enter_Method_Silent();
-    apMap[apid]->handleMsgFromNetwLayer(msg);
+    if (apMap.find(apid) != apMap.end()) {
+        apMap[apid]->handleMsgFromNetwLayer(msg);
+    }else{
+        delete msg;
+    }
 }
 
 void GlobalNetworkLayer::sortGCUList() {

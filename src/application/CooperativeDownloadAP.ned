@@ -24,6 +24,9 @@ simple CooperativeDownloadAP like IBaseApplLayer
     
     parameters:
     	int  headerLength @unit("bit");   // length of the application message header (in bits)
+    	double frameInterval @unit("s") = default(0.1s);
+    	double APframeSize @unit("kb") = default(150kb);
+    	// TODO add from above.
     gates:
     	input lowerLayerIn; // from network layer
         output lowerLayerOut; // to network layer

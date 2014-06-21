@@ -72,6 +72,7 @@ private:
     void requestContentFromCar();   //request content from a car.
     void sendIsBusyTo(int carid);
     void sendNagativeTo(int carid);
+    void changeToIdel();
 
     void clearContentMap();
     void clearTimeMap();
@@ -91,7 +92,8 @@ private:
     cMessage* frameTimer;
 
     enum CarStatus{
-        CAR_IDEL = 0,
+        CAR_INIT = 0,
+        CAR_IDEL,
         CAR_BUSY,
         CAR_SENSING,
         CAR_SCANING,

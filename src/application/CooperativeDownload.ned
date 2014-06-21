@@ -27,6 +27,9 @@ simple CooperativeDownload like IBaseApplLayer
     	int  headerLength @unit("bit") = default(10bit);   // length of the application message header (in bits)
     	bool isTargetCar = default(false);
     	double taskSize @unit("kb") = default(1024kb);
+    	double frameSize @unit("kb") = default(5kb);
+    	double frameInterval @unit("s") = default(0.1s);
+    	double APframeSize @unit("kb") = default(150kb);
     gates:
     	input lowerLayerIn; // from network layer
         output lowerLayerOut; // to network layer

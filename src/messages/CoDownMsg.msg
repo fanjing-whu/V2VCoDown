@@ -73,6 +73,13 @@ packet CoDownRequestMsg extends CoDownBaseMsg{
     double startPos;
     double endPos;
 }
+packet CoDownRequestAPMsg extends CoDownBaseMsg{
+    double speed;
+    double angle;
+    double startPos;
+    double endPos;
+    double position;
+}
 packet CoDownAPContentMsg extends CoDownBaseMsg{
     double startTime;
     double endTime;
