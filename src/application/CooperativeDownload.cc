@@ -36,6 +36,9 @@ CooperativeDownload::~CooperativeDownload() {
 }
 
 void CooperativeDownload::finish() {
+    if (isTargetCar) {
+        recordScalar("test", contentQueueMap[gcu->getAddr()]->length(), "0");
+    }
     clearContentMap();
     clearTimeMap();
     cancelAndDelete(frameTimer);
@@ -86,38 +89,39 @@ void CooperativeDownload::handleLowerControl(cMessage* msg) {
         switch (cdmsg->getMsgType()) {
         case CDCMT_ConnectToAP:
             debugEV
-                    << "CooperativeDownload::handleLowerMsg::CDCMT_ConnectToAP: "
+                    << "CooperativeDownload::handleLowerControlMsg::CDCMT_ConnectToAP: "
                     << cdmsg->getTargetId() << endl;
             connectToAP(cdmsg->getTargetId());
             break;
         case CDCMT_ConnectToGCU:
             debugEV
-                    << "CooperativeDownload::handleLowerMsg::CDCMT_ConnectToGCU: "
+                    << "CooperativeDownload::handleLowerControlMsg::CDCMT_ConnectToGCU: "
                     << cdmsg->getTargetId() << endl;
             connectToCar(cdmsg->getTargetId());
             break;
         case CDCMT_DisconnectFromAP:
             debugEV
-                    << "CooperativeDownload::handleLowerMsg::CDCMT_DisconnectFromAP: "
+                    << "CooperativeDownload::handleLowerControlMsg::CDCMT_DisconnectFromAP: "
                     << cdmsg->getTargetId() << endl;
             disconnectFromAP(cdmsg->getTargetId());
             break;
         case CDCMT_DisconnectFromGCU:
             debugEV
-                    << "CooperativeDownload::handleLowerMsg::CDCMT_DisconnectFromGCU: "
+                    << "CooperativeDownload::handleLowerControlMsg::CDCMT_DisconnectFromGCU: "
                     << cdmsg->getTargetId() << endl;
             disconnectFromCar(cdmsg->getTargetId());
             break;
         case CDCMT_DisconnectAll:
             debugEV
-                    << "CooperativeDownload::handleLowerMsg::CDCMT_DisconnectAll"
+                    << "CooperativeDownload::handleLowerControlMsg::CDCMT_DisconnectAll"
                     << endl;
             selfReset();
             break;
         case CDCMT_UpdatePostion:
             debugEV
-                    << "CooperativeDownload::handleLowerMsg::CDCMT_UpdatePostion"
+                    << "CooperativeDownload::handleLowerControlMsg::CDCMT_UpdatePostion"
                     << endl;
+            makeRecord();
             break;
         default:
             break;
@@ -624,6 +628,14 @@ void CooperativeDownload::changeToIdel() {
             car_Status = CAR_IDEL;
             cancelEvent(frameTimer);
             //scheduleAt(simTime()+frameInterval,frameTimer);
+        }
+    }
+}
+
+void CooperativeDownload::makeRecord() {
+    if (isTargetCar) {
+        if(gcu->getCurrentPostion().x>19900.0){
+            endSimulation();
         }
     }
 }

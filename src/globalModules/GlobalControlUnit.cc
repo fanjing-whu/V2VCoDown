@@ -101,7 +101,9 @@ void GlobalControlUnit::setCurrentPostion(Coord pos) {
 
 void GlobalControlUnit::sendMsgToAP(int apid, cMessage* msg) {
     Enter_Method_Silent();
-    gnl->sendMsgToAP(apid, msg);
+    cMessage* dup = msg->dup();
+    gnl->sendMsgToAP(apid, dup);
+    delete msg;
 }
 
 void GlobalControlUnit::handleSelfMsg(cMessage* msg) {
@@ -129,7 +131,9 @@ int GlobalControlUnit::getAddr() {
 
 void GlobalControlUnit::handleMsgFromNetwLayer(cMessage* msg) {
     Enter_Method_Silent();
-    sendUp(msg);
+    cMessage* dup = msg->dup();
+    sendUp(dup);
+    delete(msg);
 }
 
 void GlobalControlUnit::setAddr(int addr) {
@@ -217,14 +221,17 @@ Coord GlobalControlUnit::getCurrentSpeed() {
 }
 
 void GlobalControlUnit::setCurrentSpeed(Coord speed) {
+    Enter_Method_Silent();
     this->lastSpeed = speed;
 }
 
 void GlobalControlUnit::setSpeed(Coord speed) {
+    Enter_Method_Silent();
     this->averageSpeed = speed;
 }
 
 Coord GlobalControlUnit::getSpeed() {
+    Enter_Method_Silent();
     return averageSpeed;
 }
 

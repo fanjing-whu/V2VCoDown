@@ -72,50 +72,50 @@ public:
         this->m_apid = 0;
     }
 public:
-    bool isAp(){
+    virtual bool isAp(){
         return m_isAp;
     }
-    void isAp(bool isAp){
+    virtual void isAp(bool isAp){
         this->m_isAp = isAp;
     }
-    bool isConnectedTo(IGlobalControlUnit* gcu){
+    virtual bool isConnectedTo(IGlobalControlUnit* gcu){
         return neighbors.find(gcu->getAddr())!=neighbors.end();
     }
-    bool isInRange(IGlobalControlUnit* gcu){
+    virtual bool isInRange(IGlobalControlUnit* gcu){
         return (getDistFrom(gcu)<=gcu->receivePower+sendPower)&&(getDistFrom(gcu)<=receivePower+gcu->sendPower);
     }
-    double getDistFrom(IGlobalControlUnit* gcu){
+    virtual double getDistFrom(IGlobalControlUnit* gcu){
         return fabs(this->getCurrentPostion().x-gcu->getCurrentPostion().x);
     }
-    bool hasAp(){
+    virtual bool hasAp(){
         return m_hasAp;
     }
-    int getApid(){
+    virtual int getApid(){
         return m_hasAp?m_apid:-1;
     }
-    void setApid(int apid){
+    virtual void setApid(int apid){
         this->m_apid = apid;
     }
-    GCU_IGCU_MAP* getNeighbors() {
+    virtual GCU_IGCU_MAP* getNeighbors() {
         return &neighbors;
     }
 
-    double getReceivePower() const
+    virtual double getReceivePower() const
     {
         return receivePower;
     }
 
-    void setReceivePower(double receivePower)
+    virtual void setReceivePower(double receivePower)
     {
         this->receivePower = receivePower;
     }
 
-    double getSendPower() const
+    virtual double getSendPower() const
     {
         return sendPower;
     }
 
-    void setSendPower(double sendPower)
+    virtual void setSendPower(double sendPower)
     {
         this->sendPower = sendPower;
     }

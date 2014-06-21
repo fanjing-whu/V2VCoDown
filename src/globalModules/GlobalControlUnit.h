@@ -60,6 +60,63 @@ public:
     virtual void sendUp(cMessage *msg);
 
     virtual void sendControlUp(cMessage *msg);
+
+    virtual bool isAp(){
+        Enter_Method_Silent();
+        return m_isAp;
+    }
+    virtual void isAp(bool isAp){
+        Enter_Method_Silent();
+        this->m_isAp = isAp;
+    }
+    virtual bool isConnectedTo(IGlobalControlUnit* gcu){
+        Enter_Method_Silent();
+        return neighbors.find(gcu->getAddr())!=neighbors.end();
+    }
+    virtual bool isInRange(IGlobalControlUnit* gcu){
+        Enter_Method_Silent();
+        return (getDistFrom(gcu)<=gcu->getReceivePower()+getSendPower())&&(getDistFrom(gcu)<=getReceivePower()+gcu->getSendPower());
+    }
+    virtual double getDistFrom(IGlobalControlUnit* gcu){
+        Enter_Method_Silent();
+        return fabs(this->getCurrentPostion().x-gcu->getCurrentPostion().x);
+    }
+    virtual bool hasAp(){
+        Enter_Method_Silent();
+        return m_hasAp;
+    }
+    virtual int getApid(){
+        Enter_Method_Silent();
+        return m_hasAp?m_apid:-1;
+    }
+    virtual void setApid(int apid){
+        Enter_Method_Silent();
+        this->m_apid = apid;
+    }
+    virtual GCU_IGCU_MAP* getNeighbors() {
+        Enter_Method_Silent();
+        return &neighbors;
+    }
+
+    virtual double getReceivePower() const{
+        Enter_Method_Silent();
+        return receivePower;
+    }
+
+    virtual void setReceivePower(double receivePower){
+        Enter_Method_Silent();
+        this->receivePower = receivePower;
+    }
+
+    virtual double getSendPower() const{
+        Enter_Method_Silent();
+        return sendPower;
+    }
+
+    virtual void setSendPower(double sendPower){
+        Enter_Method_Silent();
+        this->sendPower = sendPower;
+    }
 protected:
 
     /* gate ids */

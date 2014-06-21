@@ -36,9 +36,9 @@ simple HorizontalMobility extends BaseMobility
         @class(HorizontalMobility);
         bool debug = default(false); // debug switch
         double angle = default(180);
-        double speed @unit(mps) = default(uniform(20mps,35mps)); // speed of the host (in m/s)
-        double acceleration @unit(mpss) = default(uniform(2mpss,3.5mpss)); // acceleration of linear motion (m/s2)
-        double speedOffset @unit(mps) = default(uniform(5mps,7mps));
+        double speed @unit(mps) = default(uniform(25mps,33.333mps)); // speed of the host (in m/s)
+        double acceleration @unit(mpss) = default(uniform(0.139mpss,0.278mpss)); // acceleration of linear motion (m/s2)
+        double speedOffset @unit(mps) = default(uniform(1.389mps,2.778mps));
         double updateInterval @unit(s) = default(0.1s); // time interval to update the hosts position (seconds)
 }
 

@@ -73,6 +73,7 @@ private:
     void sendIsBusyTo(int carid);
     void sendNagativeTo(int carid);
     void changeToIdel();
+    void makeRecord();
 
     void clearContentMap();
     void clearTimeMap();

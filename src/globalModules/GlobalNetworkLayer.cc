@@ -85,9 +85,12 @@ void GlobalNetworkLayer::refreshGCU(IGlobalControlUnit* gcu) {
         }
         //connect to the behind GCU
         it = thisGCU;
-        for(it--;it!=gcuSortedList.begin()&&gcu->isInRange(*it);it--){
-            if(!gcu->isConnectedTo(*it)){
-                gcu->connectToGCU(*it);
+        if (it != gcuSortedList.begin()) {
+            for (it--; it != gcuSortedList.begin() && gcu->isInRange(*it);
+                    it--) {
+                if (!gcu->isConnectedTo(*it)) {
+                    gcu->connectToGCU(*it);
+                }
             }
         }
     }
@@ -120,7 +123,9 @@ void GlobalNetworkLayer::sendMsg(cMessage* msg) {
 void GlobalNetworkLayer::sendMsgToAP(int apid, cMessage* msg) {
     Enter_Method_Silent();
     if (apMap.find(apid) != apMap.end()) {
-        apMap[apid]->handleMsgFromNetwLayer(msg);
+        cMessage* dup = msg->dup();
+        apMap[apid]->handleMsgFromNetwLayer(dup);
+        delete msg;
     }else{
         delete msg;
     }

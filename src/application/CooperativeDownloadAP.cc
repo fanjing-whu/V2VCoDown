@@ -156,7 +156,7 @@ void CooperativeDownloadAP::handleHelloMsg(cMessage* msg) {
     car.angle = cdmsg->getAngle();
     car.postion = cdmsg->getPosition();
     car.speed = cdmsg->getSpeed();
-    car.time = simTime();
+    car.time = simTime().dbl();
     carInfoList[cdmsg->getSrcAddr()] = car;
     untappedCarList.push_back(cdmsg->getSrcAddr());
 }
