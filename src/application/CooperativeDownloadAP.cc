@@ -59,7 +59,7 @@ void CooperativeDownloadAP::initialize(int stage)
 
         getParentModule()->getDisplayString().setTagArg("b", 2, "rect");
         getParentModule()->getDisplayString().setTagArg("b", 3, "red");
-        getParentModule()->getDisplayString().setTagArg("b", 4, "red");
+        getParentModule()->getDisplayString().setTagArg("b", 4, "white");
         updatePosition();
     }else if(stage == 1){
 
@@ -67,7 +67,7 @@ void CooperativeDownloadAP::initialize(int stage)
 }
 
 void CooperativeDownloadAP::handleSelfMsg(cMessage* msg) {
-    // TODO ap does not handle any self-messages for now.
+    // ap does not handle any self-messages for now.
 }
 
 void CooperativeDownloadAP::handleLowerMsg(cMessage* msg) {
@@ -164,6 +164,7 @@ void CooperativeDownloadAP::handleHelloMsg(cMessage* msg) {
     car.postion = cdmsg->getPosition();
     car.speed = cdmsg->getSpeed();
     car.time = simTime().dbl();
+    carInfoList.erase(cdmsg->getSrcAddr());
     carInfoList[cdmsg->getSrcAddr()] = car;
     debugEV << " car[" << cdmsg->getSrcAddr() << "] is connected to ap["
                    << gcu->getApid() << "];" << endl;
@@ -191,7 +192,7 @@ void CooperativeDownloadAP::handleRequestAP(cMessage* msg) {
         return;
     }
     if(cdmsg->getDestAddr()<0){
-        handleRequestAPFromCar(cdmsg);
+        handleRequestAPFromAP(cdmsg);
     }else{
         handleRequestAPFromCar(cdmsg);
     }
@@ -245,6 +246,7 @@ void CooperativeDownloadAP::handleAskAPMsgFromCar(CoDownAskAPMsg* msg) {
             contentQueueMap[carid]->add(*content);
             delete(content);
         }else{
+            debugEV<<"AP "<<gcu->getAddr() <<" gets the data of ["<<content->length()<<"] size."<<endl;
             contentQueueMap[carid] = content;
         }
         {
@@ -271,6 +273,7 @@ void CooperativeDownloadAP::handleAskAPMsgFromCar(CoDownAskAPMsg* msg) {
             contentQueueMap[carid] = contentTotal;
         }
     }
+    getParentModule()->getDisplayString().setTagArg("b", 3, "green");
     // 3rd. send content to this car.
     sendContentToCar(carid);
 }
@@ -299,6 +302,7 @@ void CooperativeDownloadAP::handleAskAPMsgFromAP(CoDownAskAPMsg* msg) {
         carInfoList[carid] = carInfo;
     }
     if(apnum == -1){
+        getParentModule()->getDisplayString().setTagArg("b", 3, "yellow");
         activatedTargetList.insert(carid);
         targetCarList[carid] = TS_PREAP0;
         DATime0 = simTime().dbl()+(maxAPRadius*2 + maxDALength/2)/speed;
@@ -313,10 +317,11 @@ void CooperativeDownloadAP::handleAskAPMsgFromAP(CoDownAskAPMsg* msg) {
     }
     // 2nd. allocate the task to next ap
     SegmentQueue* contentTotal = new SegmentQueue(startPos,endPos);
-    double mineTaskSize = apnum == -1?maxDLSizePerAP+maxDLSizePerDA/2:maxDLSizePerAP+maxDLSizePerDA;
+    double mineTaskSize = apnum == -1?(maxDLSizePerAP+maxDLSizePerDA/2):(maxDLSizePerAP+maxDLSizePerDA);
     debugEV<<"mineTaskSize"<<mineTaskSize<<endl;
     if(taskSize>mineTaskSize){
         SegmentQueue* content = contentTotal->getFirstSegment(mineTaskSize);
+        debugEV<<"AP "<<gcu->getAddr() <<" gets the data of ["<<content->length()<<"] size."<<endl;
         contentTotal->remove(*content);
         if(contentQueueMap.find(carid)!=contentQueueMap.end()){
             contentQueueMap[carid]->add(*content);
@@ -364,9 +369,17 @@ void CooperativeDownloadAP::handleRequestAPFromCar(CoDownRequestAPMsg* msg) {
     delete msg;
     debugEV<<"get request AP message from car "<<carid<<endl;
     // 1st. update the carlist.
+    _Car_Info carInfo;
+    carInfo.time = simTime().dbl();
+    carInfo.angle = angle;
+    carInfo.postion = position;
+    carInfo.speed = speed;
+    carInfoList.erase(carid);
+    carInfoList[carid] = carInfo;
     if(targetCarList[carid]!=TS_INRANGE){
         // send CDMT_AskAP message
         targetCarList[carid] = TS_INRANGE;
+        getParentModule()->getDisplayString().setTagArg("b", 3, "green");
         {
             CoDownRequestAPMsg* cdmsg = new CoDownRequestAPMsg();
             cdmsg->setMsgType(CDMT_RequestAP);
@@ -395,12 +408,21 @@ void CooperativeDownloadAP::handleRequestAPFromAP(CoDownRequestAPMsg* msg) {
     // double taskSize = endPos - startPos;
     delete msg;
     // 1st. update the carlist.
+    _Car_Info carInfo;
+    carInfo.time = simTime().dbl();
+    carInfo.angle = angle;
+    carInfo.postion = position;
+    carInfo.speed = speed;
+    carInfoList.erase(carid);
+    carInfoList[carid] = carInfo;
     if (apnum == -1) {
+        getParentModule()->getDisplayString().setTagArg("b", 3, "yellow");
         targetCarList[carid] = TS_PREAP0;
         DATime0 = simTime().dbl()+(maxAPRadius*2 + maxDALength/2)/speed;
         DATime1 = simTime().dbl()+(maxAPRadius*2 + maxDALength)/speed;
         if(activatedTargetList.find(carid)==activatedTargetList.end()){
             debugEV<<"Error: the car must be activated before here."<<endl;
+            ASSERT(0);
         }
         // send CDMT_AskAP message
         {
@@ -429,6 +451,8 @@ void CooperativeDownloadAP::sendContentToCar(int carid) {
     SegmentQueue* content = contentQueueMap[carid]->getFirstSegment(
             APframeSize);
     contentQueueMap[carid]->remove(*content);
+    debugEV << "AP " << gcu->getAddr() << " still has data of ["
+                   << contentQueueMap[carid]->length() << "] size." << endl;
     {
         CoDownContentMsg* cdmsg = new CoDownContentMsg();
         cdmsg->setMsgType(CDMT_Send);
@@ -437,6 +461,9 @@ void CooperativeDownloadAP::sendContentToCar(int carid) {
         cdmsg->setStartPos(content->getFirstStart());
         cdmsg->setEndPos(content->getFirstEnd());
         cdmsg->setLastMsg(contentQueueMap[carid]->empty());
+        if(contentQueueMap[carid]->empty()){
+            debugEV<<"contentQueueMap[carid] is empty now. "<<endl;
+        }
         sendDelayedDown(cdmsg, frameInterval);
     }
     delete content;
@@ -478,13 +505,18 @@ void CooperativeDownloadAP::choseAssistedCAr() {
                 duration->remove(*timeQueueMap[target]);
                 SegmentQueue* time = duration->getFirstSegment();
                 if(time->length()>2.0){
-                    sendAPContentToCar(target,assistor,time);
+                    debugEV << "chose an assistor: the collide time is ["
+                                   << time->length() << ": " << bTime << ", "
+                                   << eTime << " ]." << endl;
+                    sendAPContentToCar(target, assistor, time);
                     assistedCarList.push_back(assistor);
                     it_car = untappedCarList.erase(it_car);
                     flag = false;
                 }
                 delete duration;
                 delete time;
+            }else{
+
             }
             if(it_car!=untappedCarList.end()){
                 if(flag){
@@ -498,8 +530,15 @@ void CooperativeDownloadAP::choseAssistedCAr() {
 }
 
 void CooperativeDownloadAP::sendAPContentToCar(int target, int assistor , SegmentQueue* time) {
-    SegmentQueue* content = contentQueueMap[target]->getFirstSegment(APDLSpeed * time->length());
+    SegmentQueue* content = contentQueueMap[target]->getFirstSegment(
+            CarDLSpeed * (time->length() - 1.0));
+    debugEV << "AP " << gcu->getAddr() << " has data of ["
+                   << contentQueueMap[target]->length() << "] size." << endl;
+    debugEV << "AP " << gcu->getAddr() << " sent data of ["
+                   << content->length() << "] size to an assistor." << endl;
     contentQueueMap[target]->remove(*content);
+    debugEV << "AP " << gcu->getAddr() << " still has data of ["
+                   << contentQueueMap[target]->length() << "] size." << endl;
     timeQueueMap[target]->add(*time);
     {
         CoDownAPContentMsg* cdmsg = new CoDownAPContentMsg();

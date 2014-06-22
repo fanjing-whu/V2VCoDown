@@ -25,12 +25,12 @@ simple CooperativeDownloadAP like IBaseApplLayer
     parameters:
     	int  headerLength @unit("bit");   // length of the application message header (in bits)
     	double frameInterval @unit("s") = default(0.1s);
-    	double APframeSize @unit("kb") = default(150kb);
+    	double APframeSize @unit("kb") = default(15kb);
     	double maxDALength @unit("m") = default(8000m);
     	double maxAPRadius @unit("m") = default(400m);
     	double minCarSpeed @unit("mps") = default(22mps);
-    	double APDLSpeed @unit("kbps") = default(1500kbps);
-    	double CarDLSpeed @unit("kbps") = default(500kbps);
+    	double APDLSpeed @unit("kbps") = default(150kbps);
+    	double CarDLSpeed @unit("kbps") = default(50kbps);
     	double carComRadius @unit("m") = default(250m);
         double x; 
         double y; 

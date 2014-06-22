@@ -37,7 +37,7 @@ CooperativeDownload::~CooperativeDownload() {
 
 void CooperativeDownload::finish() {
     if (isTargetCar) {
-        recordScalar("test", unfinishedTask);
+        recordScalar("test", taskSize-unfinishedTask);
     }
     clearContentMap();
     clearTimeMap();
@@ -410,6 +410,7 @@ void CooperativeDownload::sendSensorMsgToCar() {
         return;
     }
     car_Status = CAR_PRESENDING;
+    cancelEvent(frameTimer);
     targetID = *(untappedCarList.begin());
     debugEV<<"sendSensorMsgToCar: "<<targetID<<endl;
     {
