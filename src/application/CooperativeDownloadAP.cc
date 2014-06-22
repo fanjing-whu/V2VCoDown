@@ -56,6 +56,11 @@ void CooperativeDownloadAP::initialize(int stage)
 
         maxDLSizePerAP = (2 * maxAPRadius / minCarSpeed) * APDLSpeed;
         maxDLSizePerDA = (maxDALength / minCarSpeed) * CarDLSpeed;
+
+        getParentModule()->getDisplayString().setTagArg("b", 2, "rect");
+        getParentModule()->getDisplayString().setTagArg("b", 3, "red");
+        getParentModule()->getDisplayString().setTagArg("b", 4, "red");
+        updatePosition();
     }else if(stage == 1){
 
     }
@@ -357,13 +362,14 @@ void CooperativeDownloadAP::handleRequestAPFromCar(CoDownRequestAPMsg* msg) {
     double position = msg->getPosition();
     // double taskSize = endPos - startPos;
     delete msg;
+    debugEV<<"get request AP message from car "<<carid<<endl;
     // 1st. update the carlist.
     if(targetCarList[carid]!=TS_INRANGE){
         // send CDMT_AskAP message
         targetCarList[carid] = TS_INRANGE;
         {
-            CoDownAskAPMsg* cdmsg = new CoDownAskAPMsg();
-            cdmsg->setMsgType(CDMT_AskAP);
+            CoDownRequestAPMsg* cdmsg = new CoDownRequestAPMsg();
+            cdmsg->setMsgType(CDMT_RequestAP);
             cdmsg->setSrcAddr(carid);
             cdmsg->setDestAddr(-1);
             cdmsg->setSpeed(speed);
@@ -398,8 +404,8 @@ void CooperativeDownloadAP::handleRequestAPFromAP(CoDownRequestAPMsg* msg) {
         }
         // send CDMT_AskAP message
         {
-            CoDownAskAPMsg* cdmsg = new CoDownAskAPMsg();
-            cdmsg->setMsgType(CDMT_AskAP);
+            CoDownRequestAPMsg* cdmsg = new CoDownRequestAPMsg();
+            cdmsg->setMsgType(CDMT_RequestAP);
             cdmsg->setSrcAddr(carid);
             cdmsg->setDestAddr(apnum - 1);
             cdmsg->setSpeed(speed);
@@ -419,6 +425,7 @@ void CooperativeDownloadAP::handleRequestAPFromAP(CoDownRequestAPMsg* msg) {
 }
 
 void CooperativeDownloadAP::sendContentToCar(int carid) {
+    debugEV<<"start send content to car "<<carid<<endl;
     SegmentQueue* content = contentQueueMap[carid]->getFirstSegment(
             APframeSize);
     contentQueueMap[carid]->remove(*content);
@@ -491,7 +498,7 @@ void CooperativeDownloadAP::choseAssistedCAr() {
 }
 
 void CooperativeDownloadAP::sendAPContentToCar(int target, int assistor , SegmentQueue* time) {
-    SegmentQueue* content = contentQueueMap[target]->getFirstSegment(APDLSpeed*time->length());
+    SegmentQueue* content = contentQueueMap[target]->getFirstSegment(APDLSpeed * time->length());
     contentQueueMap[target]->remove(*content);
     timeQueueMap[target]->add(*time);
     {
@@ -507,6 +514,25 @@ void CooperativeDownloadAP::sendAPContentToCar(int target, int assistor , Segmen
         sendDelayedDown(cdmsg, frameInterval);
     }
     delete content;
+}
+
+void CooperativeDownloadAP::updatePosition() {
+    EV<< "updatePosition: " << gcu->getCurrentPostion().info() << endl;
+
+    if(ev.isGUI())
+    {
+        std::ostringstream osDisplayTag;
+        cDisplayString& disp = findHost()->getDisplayString();
+
+        // setup output stream
+        osDisplayTag << std::fixed; osDisplayTag.precision(5);
+        osDisplayTag << ( gcu->getCurrentPostion().x);
+        disp.setTagArg("p", 0, osDisplayTag.str().data());
+
+        osDisplayTag.str("");// reset
+        osDisplayTag << ( gcu->getCurrentPostion().y - 50);
+        disp.setTagArg("p", 1, osDisplayTag.str().data());
+    }
 }
 
 void CooperativeDownloadAP::clearTimeMap() {

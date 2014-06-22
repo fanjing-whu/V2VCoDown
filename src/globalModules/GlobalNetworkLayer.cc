@@ -78,8 +78,8 @@ void GlobalNetworkLayer::refreshGCU(IGlobalControlUnit* gcu) {
         ASSERT2(thisGCU != gcuSortedList.end(), "Error: this GCU is unregistered.");
         //connect to the cars
         GNL_IGCU_LIST::iterator it = gcuSortedList.begin();
-        for(it++;it!=gcuSortedList.end()&&gcu->isInRange(*it);it++){
-            if(!gcu->isConnectedTo(*it)){
+        for(it++;it!=gcuSortedList.end();it++){
+            if(gcu->isInRange(*it)&&!gcu->isConnectedTo(*it)){
                 gcu->connectToGCU(*it);
             }
         }

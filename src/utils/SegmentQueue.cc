@@ -395,9 +395,14 @@ double SegmentQueue::getFirstEnd() {
 }
 
 bool SegmentQueue::isCollide(SegmentQueue& sq) {
+    SegmentQueue* origin = sq.copy();
     SegmentQueue* copy = sq.copy();
     copy->remove(*this);
-    return !copy->empty();
+    origin->remove(*copy);
+    bool flag = !origin->empty();
+    delete copy;
+    delete origin;
+    return flag;
 }
 
 void SegmentQueue::init(double start, double end) {

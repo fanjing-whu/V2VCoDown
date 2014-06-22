@@ -76,6 +76,9 @@ public:
     }
     virtual bool isInRange(IGlobalControlUnit* gcu){
         Enter_Method_Silent();
+        if(this == gcu){
+            return false;
+        }
         return (getDistFrom(gcu)<=gcu->getReceivePower()+getSendPower())&&(getDistFrom(gcu)<=getReceivePower()+gcu->getSendPower());
     }
     virtual double getDistFrom(IGlobalControlUnit* gcu){

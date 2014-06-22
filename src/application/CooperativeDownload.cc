@@ -61,6 +61,7 @@ void CooperativeDownload::initialize(int stage)
         APframeSize = par("APframeSize").doubleValue();
         frameTimer = new cMessage("frameTimer");
 
+        getParentModule()->getDisplayString().setTagArg("b", 3, "white");
         car_Status = CAR_IDEL;
         if(isTargetCar){
             car_Status = CAR_INIT;
@@ -206,6 +207,7 @@ void CooperativeDownload::askForDownload(int apid) {
 }
 
 void CooperativeDownload::selfReset() {
+    getParentModule()->getDisplayString().setTagArg("b", 3, "white");
     clearContentMap();
     clearTimeMap();
     untappedCarList.clear();
@@ -369,6 +371,7 @@ void CooperativeDownload::sendContentToCar() {
 }
 
 void CooperativeDownload::requestContentFromAP() {
+    debugEV<<"start request content from ap"<<gcu->getApid()<<endl;
     if(car_Status == CAR_AP){
         SegmentQueue* content = contentQueueMap[gcu->getAddr()]->getFirstSegment(
                 APframeSize);
@@ -391,9 +394,10 @@ void CooperativeDownload::requestContentFromAP() {
 }
 
 void CooperativeDownload::requestContentFromCar() {
-    car_Status = CAR_SCANING;
+    debugEV<<"requestContentFromCar: "<<targetID<<endl;
+    car_Status = CAR_SENDING;
     {
-        CoDownBaseMsg* cdmsg = new CoDownBaseMsg();
+        CoDownRequestMsg* cdmsg = new CoDownRequestMsg();
         cdmsg->setMsgType(CDMT_Request);
         cdmsg->setSrcAddr(gcu->getAddr());
         cdmsg->setDestAddr(targetID);
@@ -466,14 +470,17 @@ void CooperativeDownload::handleReplyMsg(CoDownBaseMsg* msg) {
     if(cdmsg->getSrcAddr() == targetID&& car_Status == CAR_PRESENDING){
         // decide to download data or not
         // caculate the contact time
-        double time = (gcu->getCurrentSpeed().x
-                - (cdmsg->getSpeed() * cos(PI * cdmsg->getAngle() / 180)))
-                / (cdmsg->getPosition() - gcu->getCurrentPostion().x
-                        + 2 * gcu->getSendPower());
+        double time =
+                (cdmsg->getPosition() - gcu->getCurrentPostion().x
+                        + 2 * gcu->getSendPower())
+                        / (gcu->getCurrentSpeed().x
+                                - (cdmsg->getSpeed()
+                                        * cos(PI * cdmsg->getAngle() / 180)));
         debugEV<<"collide time:"<<time<<endl;
         if(time >= 1.0){
             SegmentQueue* content = new SegmentQueue(cdmsg->getStartPos(),cdmsg->getEndPos());
             if(contentQueueMap[gcu->getAddr()]->isCollide(*content)){
+                debugEV<<"try to get date from:"<<targetID<<endl;
                 car_Status = CAR_SENDING;
                 // after 1.0 second start request message from this car.
                 scheduleAt(simTime()+1.0-frameInterval,frameTimer);
@@ -531,12 +538,21 @@ void CooperativeDownload::handleAPSendMsg(CoDownBaseMsg* msg) {
     if(isTargetCar){
         // do nothing
     }else{
-        if(contentQueueMap.find(cdmsg->getTargetId()) != contentQueueMap.end()){
+        if(contentQueueMap.find(cdmsg->getTargetId()) == contentQueueMap.end()){
             contentQueueMap[cdmsg->getTargetId()]
                             = new SegmentQueue(cdmsg->getStartPos(),cdmsg->getEndPos());
             timeQueueMap[cdmsg->getTargetId()]
                          = new SegmentQueue(cdmsg->getStartTime(),cdmsg->getEndTime());
+        }else{
+            SegmentQueue* content = new SegmentQueue(cdmsg->getStartPos(),cdmsg->getEndPos());
+            contentQueueMap[cdmsg->getTargetId()]->add(*content);
+            SegmentQueue* time = new SegmentQueue(cdmsg->getStartTime(),cdmsg->getEndTime());
+            timeQueueMap[cdmsg->getTargetId()]->add(*time);
+            delete content;
+            delete time;
         }
+
+        getParentModule()->getDisplayString().setTagArg("b", 3, "green");
     }
     delete cdmsg;
 }
@@ -563,6 +579,7 @@ void CooperativeDownload::handleRequestMsg(CoDownBaseMsg* msg) {
 }
 
 void CooperativeDownload::sendIsBusyTo(int carid) {
+    debugEV<<"sendIsBusyTo: "<<carid<<endl;
     CoDownBaseMsg* cdmsg = new CoDownBaseMsg();
     cdmsg->setMsgType(CDMT_IsBusy);
     cdmsg->setSrcAddr(gcu->getAddr());
@@ -571,6 +588,7 @@ void CooperativeDownload::sendIsBusyTo(int carid) {
 }
 
 void CooperativeDownload::sendNagativeTo(int carid) {
+    debugEV<<"sendNagativeTo: "<<carid<<endl;
     CoDownBaseMsg* cdmsg = new CoDownBaseMsg();
     cdmsg->setMsgType(CDMT_Negative);
     cdmsg->setSrcAddr(gcu->getAddr());
@@ -606,6 +624,14 @@ void CooperativeDownload::handleNagativeMsg(CoDownBaseMsg* msg) {
 }
 
 void CooperativeDownload::sendReplyMsgToCar() {
+
+    debugEV<<"try to send ReplyMsg to car: "<<targetID<<endl;
+    debugEV<<"this car has content for "<<contentQueueMap.size()<<" cars."<<endl;
+    debugEV<<"content [";
+    for(CD_SQUEUE_MAP::iterator it = contentQueueMap.begin();it!=contentQueueMap.end();it++){
+        EV<<" "<<it->first;
+    }
+    EV<<" ]"<<endl;
     if(contentQueueMap.find(targetID)!= contentQueueMap.end()){
         car_Status = CAR_PRESENDING;
         {
@@ -613,7 +639,7 @@ void CooperativeDownload::sendReplyMsgToCar() {
             cdmsg->setMsgType(CDMT_Reply);
             cdmsg->setSrcAddr(gcu->getAddr());
             cdmsg->setDestAddr(targetID);
-            cdmsg->setSpeed(fabs(gcu->getSpeed().x));
+            cdmsg->setSpeed(fabs(gcu->getCurrentSpeed().x));
             cdmsg->setAngle(gcu->getSpeed().x > 0 ? 0 : 180);
             cdmsg->setPosition(gcu->getCurrentPostion().x);
             cdmsg->setStartPos(contentQueueMap[targetID]->getFirstStart());
@@ -621,6 +647,8 @@ void CooperativeDownload::sendReplyMsgToCar() {
             sendDown(cdmsg);
         }
     } else {
+        debugEV<<"have no content for car: "<<targetID<<endl;
+
         untappedCarList.remove(targetID);
         sendNagativeTo(targetID);
         changeToIdel();
@@ -651,7 +679,49 @@ void CooperativeDownload::changeToIdel() {
 }
 
 void CooperativeDownload::makeRecord() {
+    // update display string
+
     if (isTargetCar) {
+        switch (car_Status) {
+        case CAR_INIT:
+            getParentModule()->getDisplayString().setTagArg("b", 3, "white");
+            getParentModule()->getDisplayString().setTagArg("b", 4, "green");
+            break;
+        case CAR_IDEL:
+            getParentModule()->getDisplayString().setTagArg("b", 3, "blue");
+            getParentModule()->getDisplayString().setTagArg("b", 4, "black");
+            break;
+        case CAR_BUSY:
+            getParentModule()->getDisplayString().setTagArg("b", 3, "red");
+            getParentModule()->getDisplayString().setTagArg("b", 4, "black");
+            break;
+        case CAR_SENSING:
+            getParentModule()->getDisplayString().setTagArg("b", 3, "yellow");
+            getParentModule()->getDisplayString().setTagArg("b", 4, "yellow");
+            break;
+        case CAR_SCANING:
+            getParentModule()->getDisplayString().setTagArg("b", 3, "red");
+            getParentModule()->getDisplayString().setTagArg("b", 4, "red");
+            break;
+        case CAR_PRESENDING:
+            getParentModule()->getDisplayString().setTagArg("b", 3, "red");
+            getParentModule()->getDisplayString().setTagArg("b", 4, "yellow");
+            break;
+        case CAR_SENDING:
+            getParentModule()->getDisplayString().setTagArg("b", 3, "red");
+            getParentModule()->getDisplayString().setTagArg("b", 4, "red");
+            break;
+        case CAR_RECEIVING:
+            getParentModule()->getDisplayString().setTagArg("b", 3, "red");
+            getParentModule()->getDisplayString().setTagArg("b", 4, "green");
+            break;
+        case CAR_AP:
+            getParentModule()->getDisplayString().setTagArg("b", 3, "red");
+            getParentModule()->getDisplayString().setTagArg("b", 4, "black");
+            break;
+        default:
+            break;
+        }
         ASSERT(contentQueueMap.find(gcu->getAddr())!=contentQueueMap.end());
         ASSERT(contentQueueMap[gcu->getAddr()]!=NULL);
         debugEV<<"makeRecord()"<<endl;

@@ -57,6 +57,8 @@ private:
     void sendContentToCar(int carid);
     void sendAPContentToCar(int target, int assistor ,SegmentQueue* time);
     void choseAssistedCAr();
+
+    void updatePosition();
     void clearContentMap();
     void clearTimeMap();
 
