@@ -22,15 +22,7 @@
 #define GCU_IGCU_MAP std::map<int, IGlobalControlUnit*>
 class IGlobalControlUnit {
 public:
-    IGlobalControlUnit() :
-            neighbors(),
-            m_isAp(false),
-            m_hasAp(false),
-            m_apid(0),
-            lastPos(Coord::ZERO),
-            lastSpeed(Coord::ZERO),
-            sendPower(0),
-            receivePower(0){
+    IGlobalControlUnit(){
     }
     virtual ~IGlobalControlUnit() {
     }
@@ -48,88 +40,29 @@ public:
     virtual void setSpeed(Coord speed) = 0;
     virtual Coord getSpeed() = 0;
     virtual void handleMsgFromNetwLayer(cMessage* msg) = 0;
-    virtual void connectToGCU(IGlobalControlUnit* gcu) {
-        neighbors[gcu->getAddr()] = gcu;
-    }
-    virtual void disconnectFromGCU(IGlobalControlUnit* gcu) {
-        if (neighbors.erase(gcu->getAddr()) > 0) {
-            gcu->disconnectFromGCU(this);
-        }
-    }
-    virtual void disconnectAll() {
-        for (GCU_IGCU_MAP::iterator it = neighbors.begin();it != neighbors.end(); it++) {
-            this->disconnectFromGCU(it->second);
-        }
-    }
-    virtual void connectToAP(int apid) {
-        ASSERT2(m_hasAp == false, "Error: Cannot disconnect form this AP, since this GCU has already connect to an AP.");
-        m_hasAp = true;
-        this->m_apid = apid;
-    }
-    virtual void disconnectFromAP(int apid) {
-        ASSERT2(m_hasAp == true && this->m_apid == apid, "Error: Cannot disconnect form this AP, since this GCU dose not connect to it.");
-        m_hasAp = false;
-        this->m_apid = 0;
-    }
-public:
-    virtual bool isAp(){
-        return m_isAp;
-    }
-    virtual void isAp(bool isAp){
-        this->m_isAp = isAp;
-    }
-    virtual bool isConnectedTo(IGlobalControlUnit* gcu){
-        return neighbors.find(gcu->getAddr())!=neighbors.end();
-    }
-    virtual bool isInRange(IGlobalControlUnit* gcu){
-        return (getDistFrom(gcu)<=gcu->receivePower+sendPower)&&(getDistFrom(gcu)<=receivePower+gcu->sendPower);
-    }
-    virtual double getDistFrom(IGlobalControlUnit* gcu){
-        return fabs(this->getCurrentPostion().x-gcu->getCurrentPostion().x);
-    }
-    virtual bool hasAp(){
-        return m_hasAp;
-    }
-    virtual int getApid(){
-        return m_hasAp?m_apid:-1;
-    }
-    virtual void setApid(int apid){
-        this->m_apid = apid;
-    }
-    virtual GCU_IGCU_MAP* getNeighbors() {
-        return &neighbors;
-    }
+    virtual void connectToGCU(IGlobalControlUnit* gcu) = 0;
+    virtual void disconnectFromGCU(IGlobalControlUnit* gcu)  = 0;
+    virtual void disconnectAll()  = 0;
+    virtual void connectToAP(int apid) = 0;
+    virtual void disconnectFromAP(int apid)  = 0;
+    virtual bool isAp() = 0;
+    virtual void isAp(bool isAp) = 0;
+    virtual bool isConnectedTo(IGlobalControlUnit* gcu) = 0;
+    virtual bool isInRange(IGlobalControlUnit* gcu) = 0;
+    virtual double getDistFrom(IGlobalControlUnit* gcu) = 0;
+    virtual bool hasAp() = 0;
+    virtual int getApid() = 0;
+    virtual void setApid(int apid) = 0;
+    virtual GCU_IGCU_MAP* getNeighbors() = 0;
 
-    virtual double getReceivePower() const
-    {
-        return receivePower;
-    }
+    virtual double getReceivePower() const = 0;
 
-    virtual void setReceivePower(double receivePower)
-    {
-        this->receivePower = receivePower;
-    }
+    virtual void setReceivePower(double receivePower) = 0;
 
-    virtual double getSendPower() const
-    {
-        return sendPower;
-    }
+    virtual double getSendPower() const = 0;
 
-    virtual void setSendPower(double sendPower)
-    {
-        this->sendPower = sendPower;
-    }
+    virtual void setSendPower(double sendPower) = 0;
 
-protected:
-    GCU_IGCU_MAP neighbors;
-    bool m_isAp;
-    bool m_hasAp;
-    int m_apid;
-    Coord lastPos;
-    Coord lastSpeed;
-    Coord averageSpeed;
-    double sendPower;
-    double receivePower;
 };
 
 #endif /* IGLOBALCONTROLUNIT_H_ */

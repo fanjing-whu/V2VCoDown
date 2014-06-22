@@ -436,6 +436,7 @@ void CooperativeDownloadAP::sendContentToCar(int carid) {
 }
 
 void CooperativeDownloadAP::choseAssistedCAr() {
+    debugEV<<"CooperativeDownloadAP::choseAssistedCAr:start"<<endl;
     for(std::set<int>::iterator it_target = activatedTargetList.begin();it_target!=activatedTargetList.end();it_target++){
         int delta = 0;
         if(targetCarList[*it_target] == TS_PREAP0){

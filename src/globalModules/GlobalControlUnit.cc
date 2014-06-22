@@ -23,7 +23,14 @@ GlobalControlUnit::GlobalControlUnit()
      upperControlIn(0),
      upperControlOut(0),
      gnl(NULL),
-     myAddress(0)
+     myAddress(0),neighbors(),
+     m_isAp(false),
+     m_hasAp(false),
+     m_apid(0),
+     lastPos(Coord::ZERO),
+     lastSpeed(Coord::ZERO),
+     sendPower(0),
+     receivePower(0)
 {
 }
 
@@ -169,6 +176,7 @@ void GlobalControlUnit::disconnectFromGCU(IGlobalControlUnit* gcu) {
 
 void GlobalControlUnit::disconnectAll() {
     Enter_Method_Silent();
+    EV<<"neighbors.size():"<<neighbors.size()<<endl;
     for (GCU_IGCU_MAP::iterator it = neighbors.begin();it!= neighbors.end(); ) {
         this->disconnectFromGCU(it->second);
         it = neighbors.begin();

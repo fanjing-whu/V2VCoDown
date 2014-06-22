@@ -131,6 +131,15 @@ protected:
 private:
     GlobalNetworkLayer *gnl;
     int myAddress;
+    GCU_IGCU_MAP neighbors;
+    bool m_isAp;
+    bool m_hasAp;
+    int m_apid;
+    Coord lastPos;
+    Coord lastSpeed;
+    Coord averageSpeed;
+    double sendPower;
+    double receivePower;
 
 };
 
