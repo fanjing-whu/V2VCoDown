@@ -49,6 +49,7 @@ public:
 
   private:
     void sortGCUList();
+    void swap(IGlobalControlUnit*& a, IGlobalControlUnit*& b);
     int convertIPtoIndex(LAddress::L3Type ip);
     LAddress::L3Type convertIndextoIP(int index);
     GNL_IGCU_MAP gcuMap;

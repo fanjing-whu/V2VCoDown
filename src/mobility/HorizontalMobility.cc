@@ -52,6 +52,7 @@ void HorizontalMobility::initialize(int stage)
 
         gcu->setSpeed(averageSpeed);
         speedOffset = par("speedOffset").doubleValue();
+        gcu->initialPos(Coord(par("x").doubleValue(),par("y").doubleValue(),par("z").doubleValue()));
         ASSERT2(speed>speedOffset,"speed must bigger than speedOffset. Check the INI file.");
         maxSpeed = speed+speedOffset;
         minSpeed = speed-speedOffset;

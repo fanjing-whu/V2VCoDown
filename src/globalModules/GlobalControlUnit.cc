@@ -156,7 +156,7 @@ void GlobalControlUnit::connectToGCU(IGlobalControlUnit* gcu) {
     {
         CoDownCtrlMsg* msg = new CoDownCtrlMsg();
         msg->setMsgType(CDCMT_ConnectToGCU);
-        msg->setTargetId(getAddr());
+        msg->setTargetId(gcu->getAddr());
         sendControlUp(msg);
     }
 }
@@ -164,13 +164,13 @@ void GlobalControlUnit::connectToGCU(IGlobalControlUnit* gcu) {
 void GlobalControlUnit::disconnectFromGCU(IGlobalControlUnit* gcu) {
     Enter_Method_Silent();
     if (neighbors.erase(gcu->getAddr()) > 0) {
-        gcu->disconnectFromGCU(this);
         {
             CoDownCtrlMsg* msg = new CoDownCtrlMsg();
             msg->setMsgType(CDCMT_DisconnectFromGCU);
-            msg->setTargetId(getAddr());
+            msg->setTargetId(gcu->getAddr());
             sendControlUp(msg);
         }
+        gcu->disconnectFromGCU(this);
     }
 }
 
@@ -244,6 +244,17 @@ void GlobalControlUnit::setSpeed(Coord speed) {
 Coord GlobalControlUnit::getSpeed() {
     Enter_Method_Silent();
     return averageSpeed;
+}
+
+void GlobalControlUnit::initialPos(Coord pos) {
+    Enter_Method_Silent();
+    lastPos = pos;
+    {
+        CoDownCtrlMsg* msg = new CoDownCtrlMsg();
+        msg->setMsgType(CDCMT_UpdatePostion);
+        msg->setTargetId(getAddr());
+        sendControlUp(msg);
+    }
 }
 
 void GlobalControlUnit::sendControlUp(cMessage *msg) {

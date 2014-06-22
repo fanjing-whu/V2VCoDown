@@ -414,7 +414,7 @@ void SegmentQueue::init(double start, double end) {
 }
 
 void SegmentQueue::removeNode(SQueue::iterator &it) {
-    delete ((*it));
+    delete (*it);
     // (*it) = NULL;
     it = sq.erase(it);
 }

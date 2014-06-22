@@ -61,7 +61,7 @@ void GlobalNetworkLayer::refreshGCU(IGlobalControlUnit* gcu) {
     Enter_Method_Silent();
     //disconnect the out-range GCU
     {
-        GNL_IGCU_MAP oldNeighbors = GNL_IGCU_MAP((*(gcu->getNeighbors())));
+        GNL_IGCU_MAP oldNeighbors = GNL_IGCU_MAP(*(gcu->getNeighbors()));
         for(GNL_IGCU_MAP::iterator it = oldNeighbors.begin();it!=oldNeighbors.end();it++){
             if(!gcu->isInRange(it->second)){
                 gcu->disconnectFromGCU(it->second);
@@ -133,10 +133,41 @@ void GlobalNetworkLayer::sendMsgToAP(int apid, cMessage* msg) {
 
 void GlobalNetworkLayer::sortGCUList() {
     gcuSortedList.sort();
+    GNL_IGCU_LIST::iterator it0;    // pre node
+    GNL_IGCU_LIST::iterator it1;    // next node
+    GNL_IGCU_LIST::iterator ite;    // end of pre node
+    ite = gcuSortedList.end();
+    bool flag = true;
+    for(ite--;ite!=gcuSortedList.begin();ite--){
+        it0 = gcuSortedList.begin();
+        it1 = gcuSortedList.begin();
+        for(it1++;it0!=ite;it0++,it1++){
+            if(!(*(*it0)<*(*it1))){
+                swap(*it0,*it1);
+                flag = false;
+            }
+        }
+        if(flag){
+            break;
+        }else{
+            flag = true;
+        }
+    }
+    EV<<"gcuSortedList.sort():";
+    for(GNL_IGCU_LIST::iterator it = gcuSortedList.begin();it!=gcuSortedList.end();it++){
+        EV<<(*it)->getCurrentPostion().x<<" , ";
+    }
+    EV<<endl;
 }
 
 int GlobalNetworkLayer::convertIPtoIndex(LAddress::L3Type ip) {
     return ip;
+}
+
+void GlobalNetworkLayer::swap(IGlobalControlUnit*& a, IGlobalControlUnit*& b) {
+    IGlobalControlUnit* temp = a;
+    a = b;
+    b = temp;
 }
 
 LAddress::L3Type GlobalNetworkLayer::convertIndextoIP(int index) {

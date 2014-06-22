@@ -61,12 +61,14 @@ void CooperativeDownload::initialize(int stage)
         APframeSize = par("APframeSize").doubleValue();
         frameTimer = new cMessage("frameTimer");
 
-        car_Status = CAR_INIT;
+        car_Status = CAR_IDEL;
         if(isTargetCar){
+            car_Status = CAR_INIT;
             unfinishedTask = 0;
+            debugEV<<"the id of the target car is "<<gcu->getAddr()<<endl;
             contentQueueMap[gcu->getAddr()] = new SegmentQueue(0,taskSize);
-            WATCH(unfinishedTask);
         }
+        WATCH(unfinishedTask);
     }else if(stage == 1){
 
     }
@@ -166,6 +168,7 @@ void CooperativeDownload::disconnectFromCurrentCar() {
 void CooperativeDownload::connectToCar(int carid) {
     untappedCarList.push_back(carid);
     if (isTargetCar) {
+        debugEV<<"startSensingProcess:"<<car_Status<<endl;
         startSensingProcess();
     } else {
         startScanProcess();
@@ -324,14 +327,18 @@ void CooperativeDownload::handleFrameTimer() {
     }else{
         switch(car_Status){
         case CAR_AP:
+            debugEV<<"handleFrameTimer:AP"<<endl;
             requestContentFromAP();
             break;
         case CAR_IDEL:
+            debugEV<<"handleFrameTimer:IDEL"<<endl;
             startSensingProcess();
             break;
         case CAR_SENDING:
+            debugEV<<"handleFrameTimer:SENDING"<<endl;
             requestContentFromCar();
         default:
+            debugEV<<"handleFrameTimer:default"<<endl;
             break;
         }
     }
@@ -399,7 +406,8 @@ void CooperativeDownload::sendSensorMsgToCar() {
         return;
     }
     car_Status = CAR_PRESENDING;
-    targetID = *untappedCarList.begin();
+    targetID = *(untappedCarList.begin());
+    debugEV<<"sendSensorMsgToCar: "<<targetID<<endl;
     {
         CoDownBaseMsg* cdmsg = new CoDownBaseMsg();
         cdmsg->setMsgType(CDMT_Sensor);
@@ -413,6 +421,8 @@ void CooperativeDownload::startSensingProcess() {
     if(car_Status == CAR_IDEL){
         if(!untappedCarList.empty()){
             sendSensorMsgToCar();
+        }else{
+            //changeToIdel();
         }
     }
 }
@@ -431,6 +441,7 @@ void CooperativeDownload::sendScanMsgToCar() {
 }
 
 void CooperativeDownload::handleSensorMsg(CoDownBaseMsg* msg) {
+    debugEV<<"handleSensorMsgFrom: "<<msg->getSrcAddr()<<endl;
     if(isTargetCar){
         untappedCarList.remove(msg->getSrcAddr());
         sendNagativeTo(msg->getSrcAddr());
@@ -459,6 +470,7 @@ void CooperativeDownload::handleReplyMsg(CoDownBaseMsg* msg) {
                 - (cdmsg->getSpeed() * cos(PI * cdmsg->getAngle() / 180)))
                 / (cdmsg->getPosition() - gcu->getCurrentPostion().x
                         + 2 * gcu->getSendPower());
+        debugEV<<"collide time:"<<time<<endl;
         if(time >= 1.0){
             SegmentQueue* content = new SegmentQueue(cdmsg->getStartPos(),cdmsg->getEndPos());
             if(contentQueueMap[gcu->getAddr()]->isCollide(*content)){
@@ -619,16 +631,19 @@ void CooperativeDownload::changeToIdel() {
     if(isTargetCar){
         if(car_Status!=CAR_INIT){
             car_Status = CAR_IDEL;
+            targetID = -1;
             cancelEvent(frameTimer);
             scheduleAt(simTime()+frameInterval,frameTimer);
         }
     }else{
         if(contentQueueMap.empty()){
-            car_Status = CAR_INIT;
+            car_Status = CAR_IDEL;
+            targetID = -1;
             cancelEvent(frameTimer);
         }else{
             // start making backup, do nothing now
             car_Status = CAR_IDEL;
+            targetID = -1;
             cancelEvent(frameTimer);
             //scheduleAt(simTime()+frameInterval,frameTimer);
         }
@@ -637,6 +652,9 @@ void CooperativeDownload::changeToIdel() {
 
 void CooperativeDownload::makeRecord() {
     if (isTargetCar) {
+        ASSERT(contentQueueMap.find(gcu->getAddr())!=contentQueueMap.end());
+        ASSERT(contentQueueMap[gcu->getAddr()]!=NULL);
+        debugEV<<"makeRecord()"<<endl;
         unfinishedTask = contentQueueMap[gcu->getAddr()]->length();
         if(gcu->getCurrentPostion().x>19900.0){
             endSimulation();

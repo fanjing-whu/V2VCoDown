@@ -39,7 +39,7 @@ void CooperativeDownloadAP::initialize(int stage)
 {
     BaseGlobalAppLayer::initialize(stage);
     if(stage == 0){
-        gcu->setAddr(getParentModule()->getId());
+        gcu->setAddr(getParentModule()->getIndex());
         gcu->isAp(true);
         gcu->setApid(getParentModule()->getIndex());
         Coord pos = Coord(par("x").doubleValue(),par("y").doubleValue(),par("z").doubleValue());
@@ -437,7 +437,10 @@ void CooperativeDownloadAP::sendContentToCar(int carid) {
 
 void CooperativeDownloadAP::choseAssistedCAr() {
     debugEV<<"CooperativeDownloadAP::choseAssistedCAr:start"<<endl;
+    int target = 0;
+    int assistor = 0;
     for(std::set<int>::iterator it_target = activatedTargetList.begin();it_target!=activatedTargetList.end();it_target++){
+        target = *it_target;
         int delta = 0;
         if(targetCarList[*it_target] == TS_PREAP0){
             delta = 1;
@@ -446,30 +449,42 @@ void CooperativeDownloadAP::choseAssistedCAr() {
         }else{
             debugEV<<"Error: this car must not be activated car."<<endl;
         }
-        for(std::list<int>::iterator it_car = untappedCarList.begin();it_car!=untappedCarList.end();it_car++ ){
-            double bTime = carInfoList[*it_car].time
+
+        debugEV<<"untappedCarList.size(): "<<untappedCarList.size()<<endl;
+        for(std::list<int>::iterator it_car = untappedCarList.begin();it_car!=untappedCarList.end();){
+            assistor = *it_car;
+            bool flag = true;
+            double bTime = carInfoList[assistor].time
                     + ((delta + 1) * (2 * maxAPRadius) + delta * maxDALength
-                            - (carInfoList[*it_car].time
-                                    - carInfoList[*it_target].time)
-                                    * carInfoList[*it_target].speed
+                            - (carInfoList[assistor].time
+                                    - carInfoList[target].time)
+                                    * carInfoList[target].speed
                             - carComRadius)
-                            / (carInfoList[*it_car].speed
-                                    + carInfoList[*it_target].speed);
+                            / (carInfoList[assistor].speed
+                                    + carInfoList[target].speed);
             double eTime = bTime
                     + 2 * carComRadius
-                            / (carInfoList[*it_car].speed
-                                    + carInfoList[*it_target].speed);
+                            / (carInfoList[assistor].speed
+                                    + carInfoList[target].speed);
             if(bTime>DATime0&&eTime<DATime1){
                 SegmentQueue* duration = new SegmentQueue(bTime,eTime);
-                duration->remove(*timeQueueMap[*it_target]);
+                duration->remove(*timeQueueMap[target]);
                 SegmentQueue* time = duration->getFirstSegment();
                 if(time->length()>2.0){
-                    sendAPContentToCar(*it_target,*it_car,time);
-                    assistedCarList.push_back(*it_car);
-                    untappedCarList.remove(*it_car);
+                    sendAPContentToCar(target,assistor,time);
+                    assistedCarList.push_back(assistor);
+                    it_car = untappedCarList.erase(it_car);
+                    flag = false;
                 }
                 delete duration;
                 delete time;
+            }
+            if(it_car!=untappedCarList.end()){
+                if(flag){
+                    it_car++;
+                }else{
+                    flag = true;
+                }
             }
         }
     }

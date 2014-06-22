@@ -53,6 +53,7 @@ public:
     virtual void disconnectFromAP(int apid);
     virtual void sendMsgToAP(int apid, cMessage *msg);
 
+    virtual void initialPos(Coord pos);
     virtual void handleSelfMsg(cMessage* msg);
     virtual void handleUpperMsg(cMessage *msg);
     virtual void handleUpperControl(cMessage *msg);
@@ -78,7 +79,6 @@ public:
         return (getDistFrom(gcu)<=gcu->getReceivePower()+getSendPower())&&(getDistFrom(gcu)<=getReceivePower()+gcu->getSendPower());
     }
     virtual double getDistFrom(IGlobalControlUnit* gcu){
-        Enter_Method_Silent();
         return fabs(this->getCurrentPostion().x-gcu->getCurrentPostion().x);
     }
     virtual bool hasAp(){
