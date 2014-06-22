@@ -35,7 +35,7 @@ void GlobalNetworkLayer::registerGCU(IGlobalControlUnit* gcu) {
     }else{
         gcuMap[gcu->getAddr()] = gcu;
         gcuSortedList.push_back(gcu);
-        sortGCUList();
+        //sortGCUList();
     }
 }
 
@@ -70,27 +70,17 @@ void GlobalNetworkLayer::refreshGCU(IGlobalControlUnit* gcu) {
     }
     //connect the in-range GCU
     {
-        sortGCUList();
+        //sortGCUList();
         // find this GCU
         GNL_IGCU_LIST::iterator thisGCU;
         for (thisGCU = gcuSortedList.begin(); thisGCU != gcuSortedList.end()&&gcu->getAddr() != (*thisGCU)->getAddr(); thisGCU++) {
         }
         ASSERT2(thisGCU != gcuSortedList.end(), "Error: this GCU is unregistered.");
-        //connect to the front GCU
-        GNL_IGCU_LIST::iterator it = thisGCU;
+        //connect to the cars
+        GNL_IGCU_LIST::iterator it = gcuSortedList.begin();
         for(it++;it!=gcuSortedList.end()&&gcu->isInRange(*it);it++){
             if(!gcu->isConnectedTo(*it)){
                 gcu->connectToGCU(*it);
-            }
-        }
-        //connect to the behind GCU
-        it = thisGCU;
-        if (it != gcuSortedList.begin()) {
-            for (it--; it != gcuSortedList.begin() && gcu->isInRange(*it);
-                    it--) {
-                if (!gcu->isConnectedTo(*it)) {
-                    gcu->connectToGCU(*it);
-                }
             }
         }
     }
