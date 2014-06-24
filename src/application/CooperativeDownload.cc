@@ -30,6 +30,8 @@ CooperativeDownload::CooperativeDownload() {
     targetID = -1;
     car_Status = CAR_INIT;
     unfinishedTask = 0;
+    m_lastStatictisTime = 0;
+    statictisInterval = 0;
 }
 
 CooperativeDownload::~CooperativeDownload() {
@@ -60,7 +62,8 @@ void CooperativeDownload::initialize(int stage)
         frameInterval = par("frameInterval").doubleValue();
         APframeSize = par("APframeSize").doubleValue();
         frameTimer = new cMessage("frameTimer");
-
+        statictisInterval = 1.0;
+        m_lastStatictisTime = simTime().dbl();
         getParentModule()->getDisplayString().setTagArg("b", 3, "white");
         car_Status = CAR_IDEL;
         if(isTargetCar){
@@ -727,6 +730,10 @@ void CooperativeDownload::makeRecord() {
         ASSERT(contentQueueMap[gcu->getAddr()]!=NULL);
         debugEV<<"makeRecord()"<<endl;
         unfinishedTask = contentQueueMap[gcu->getAddr()]->length();
+        if(simTime().dbl()>m_lastStatictisTime+statictisInterval){
+            m_lastStatictisTime += statictisInterval;
+            gs->changeName("time-finished")<<simTime().dbl()<<taskSize-unfinishedTask<<gs->endl;
+        }
         if(gcu->getCurrentPostion().x>19900.0){
             endSimulation();
         }

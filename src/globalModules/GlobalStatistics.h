@@ -21,13 +21,15 @@
 #include<list>
 #include<string>
 #include<stdarg.h>
-
 #include"GlobalStatisticsUnit.h"
-typedef std::list<GlobalStatisticsUnit> GlobalStatisticsList;
-typedef std::map<string, GlobalStatisticsList> GlobalStatisticsMap;
+
+
+typedef std::list<GlobalStatisticsUnit*> GlobalStatisticsList;
+typedef std::map<string, GlobalStatisticsList*> GlobalStatisticsMap;
 /**
  *
  */
+
 class GlobalStatistics: public cSimpleModule {
 public:
     GlobalStatistics();
@@ -35,12 +37,22 @@ public:
 protected:
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);
+    virtual void finish();
 public:
+    typedef void* gs_eofType;
+public:
+    GlobalStatistics& operator<< (gs_eofType& e);
+    GlobalStatistics& operator<< (double num);
+    GlobalStatistics& changeName(string name);
     void record(string name, int size, ...);
     void output(string name);
+    void eof();
+public:
+    static gs_eofType endl;
 private:
     GlobalStatisticsMap globalStatisticsMap;
-
+    std::list<double> unitData;
+    string m_name;
 };
 
 #endif

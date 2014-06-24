@@ -16,7 +16,6 @@
 #ifndef __SIMPLEVEINS_COOPERATIVEDOWNLOAD_H_
 #define __SIMPLEVEINS_COOPERATIVEDOWNLOAD_H_
 
-#include <omnetpp.h>
 #include "BaseGlobalAppLayer.h"
 #include "SegmentQueue.h"
 #include "CoDownMsg_m.h"
@@ -105,6 +104,8 @@ private:
     };
     int targetID;
     CarStatus car_Status;
+    double statictisInterval;
+    double m_lastStatictisTime;
 
     double unfinishedTask;
 };

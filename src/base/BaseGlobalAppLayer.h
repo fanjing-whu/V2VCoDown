@@ -11,6 +11,7 @@
 #include "BaseApplLayer.h"
 #include "FindModule.h"
 #include "GlobalControlUnit.h"
+#include "GlobalStatistics.h"
 
 class BaseGlobalAppLayer: public BaseApplLayer {
 public:
@@ -20,9 +21,11 @@ public:
     virtual void initialize(int stage);
 protected:
     GlobalControlUnit* gcu;
+    GlobalStatistics* gs;
 
 private:
     GlobalControlUnit* getGCU();
+    GlobalStatistics* getGS();
 };
 
 #endif /* BASEGLOBALAPPLAYER_H_ */
