@@ -109,6 +109,7 @@ GlobalStatistics& GlobalStatistics::operator <<(double num) {
 
 GlobalStatistics& GlobalStatistics::changeName(string name) {
     GlobalStatisticsMap::iterator it;
+    m_name = name;
     it = globalStatisticsMap.find(m_name);
     if (it == globalStatisticsMap.end()) {
         GlobalStatisticsList* list = new GlobalStatisticsList();
